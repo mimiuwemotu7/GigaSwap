@@ -1,0 +1,112 @@
+.token-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 130px;
+  font-family: inherit;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: 48px;
+}
+
+.token-selector:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.token-selector:active {
+  transform: translateY(0);
+}
+
+.sell-token-selector {
+  background: #f8f9fa;
+  color: #333;
+  border: 1px solid #e9ecef;
+}
+
+.sell-token-selector:hover {
+  background: #e9ecef;
+  border-color: #dee2e6;
+}
+
+.buy-token-selector {
+  background: #ff1493;
+  color: white;
+}
+
+.buy-token-selector:hover {
+  background: #e91e63;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 20, 147, 0.4);
+}
+
+.select-token {
+  background: #ff1493;
+  color: white;
+}
+
+.select-token:hover {
+  background: #e91e63;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 20, 147, 0.4);
+}
+
+.eth-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.eth-diamond {
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #627eea 0%, #4c63d2 100%);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  position: relative;
+}
+
+.eth-diamond::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  background: white;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  opacity: 0.3;
+}
+
+.token-logo {
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.token-symbol {
+  font-weight: 600;
+  flex: 1;
+}
+
+.chevron {
+  font-size: 0.7rem;
+  margin-left: auto;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.token-selector:hover .chevron {
+  opacity: 1;
+}
