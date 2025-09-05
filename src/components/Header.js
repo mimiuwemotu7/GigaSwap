@@ -117,7 +117,7 @@ const Header = () => {
                       <div
                         key={notification.id}
                         onClick={() => setSelectedNotification(selectedNotification === notification.id ? null : notification.id)}
-                        className={`py-4 ${getThemeClasses(currentTheme, 'border')} hover:${getThemeClasses(currentTheme, 'hover')} transition-colors duration-200 cursor-pointer ${selectedNotification === notification.id ? getThemeClasses(currentTheme, 'notificationSelected') : ''}`}
+                        className={`py-4 ${getThemeClasses(currentTheme, 'notificationDivider')} hover:${getThemeClasses(currentTheme, 'hover')} transition-colors duration-200 cursor-pointer ${selectedNotification === notification.id ? getThemeClasses(currentTheme, 'notificationSelected') : ''}`}
                       >
                         <div className="flex items-start space-x-3">
                           <div className={`w-6 h-6 rounded-full flex items-center justify-center ${notification.type === 'success' ? getThemeClasses(currentTheme, 'notificationIconSuccess') : getThemeClasses(currentTheme, 'notificationIconDefault')}`}>

@@ -15,9 +15,10 @@ export const themes = {
       textAccent: 'text-red-400',
       
       // Border colors
-      border: 'border-b border-white',
-      borderSecondary: 'border-white',
-      borderTertiary: 'border-white',
+      border: 'border-b border-gray-700',
+      borderSecondary: 'border-gray-700',
+      borderTertiary: 'border-gray-700',
+      borderColor: 'border-gray-700',
       
       // Interactive colors
       hover: 'hover:bg-gray-700',
@@ -52,9 +53,10 @@ export const themes = {
       textAccent: 'text-red-500',
       
       // Border colors
-      border: 'border-b border-black',
-      borderSecondary: 'border-black',
-      borderTertiary: 'border-black',
+      border: 'border-b border-gray-700',
+      borderSecondary: 'border-gray-700',
+      borderTertiary: 'border-gray-700',
+      borderColor: 'border-gray-700',
       
       // Interactive colors
       hover: 'hover:bg-gray-100',
@@ -136,6 +138,7 @@ export const getThemeClasses = (theme, component, variant = 'default') => {
     notificationAction: `text-blue-400`,
     userButton: `border-[#cccccc] hover:bg-gray-100 dark:hover:bg-gray-700`,
     userButtonIcon: `text-gray-600 dark:text-gray-300`,
+    notificationDivider: `border-b ${themeColors.borderColor}`,
   };
   
   return componentStyles[component] || '';
