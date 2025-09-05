@@ -17,6 +17,9 @@ const Header = () => {
   const [showChatHistory, setShowChatHistory] = useState(false);
   const [showTokensDropdown, setShowTokensDropdown] = useState(false);
 
+  // Swipe detection constants
+  const minSwipeDistance = 50;
+
   // Global touch events for swipe functionality
   useEffect(() => {
     const handleTouchStart = (e) => {
@@ -143,10 +146,6 @@ const Header = () => {
       contractAddress: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599'
     }
   ];
-
-  // Swipe detection constants
-  const minSwipeDistance = 50;
-
 
   return (
     <header 
