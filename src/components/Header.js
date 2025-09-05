@@ -14,7 +14,6 @@ const Header = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
-  const [activeItem, setActiveItem] = useState('chats');
   const [showChatHistory, setShowChatHistory] = useState(false);
   const [showTokensDropdown, setShowTokensDropdown] = useState(false);
 
@@ -218,7 +217,6 @@ const Header = () => {
                 <div className="space-y-2">
                   <button 
                     onClick={() => {
-                      setActiveItem('chats');
                       setShowChatHistory(!showChatHistory);
                     }}
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-lg ${getThemeClasses(currentTheme, 'hover')} transition-all duration-200`}
@@ -279,7 +277,6 @@ const Header = () => {
                 <div className="space-y-2">
                   <button 
                     onClick={() => {
-                      setActiveItem('tokens');
                       setShowTokensDropdown(!showTokensDropdown);
                     }}
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-lg ${getThemeClasses(currentTheme, 'hover')} transition-all duration-200`}
