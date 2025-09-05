@@ -165,7 +165,7 @@ export const getThemeClasses = (theme, component, variant = 'default') => {
     // Token specific classes
     tokenItemContainer: `p-2 rounded-lg cursor-pointer transition-all duration-200`,
     tokenIconContainer: `w-6 h-6 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-xs font-bold`,
-    tokenSymbol: `text-xs font-medium text-left truncate`,
+    tokenSymbol: `text-xs font-medium text-left truncate ${themeColors.textPrimary}`,
     tokenName: `text-xs text-left truncate`,
     tokenPrice: `text-xs font-medium`,
     tokenChange: `text-xs`,
@@ -176,6 +176,10 @@ export const getThemeClasses = (theme, component, variant = 'default') => {
     // Theme selector
     themeSelectorIcon: `${themeColors.textPrimary}`,
     themeSelectorButton: `${themeColors.tokenSelector} hover:bg-red-500 hover:text-white`,
+    // Notification buttons
+    notificationCloseButton: `p-1 rounded transition-colors duration-200 hover:bg-red-500 hover:text-white`,
+    notificationClearButton: `text-xs transition-colors duration-200 hover:bg-red-500 hover:text-white px-2 py-1 rounded`,
+    notificationBellButton: `p-2 rounded-full border transition-all duration-200 relative hover:bg-red-500 hover:text-white`,
     // Layout containers
     listContainer: `space-y-1`,
     tokensDropdown: `max-h-[24vh] overflow-y-auto custom-scrollbar rounded-lg bg-transparent`,

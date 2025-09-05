@@ -75,12 +75,13 @@ const Header = () => {
             <ArrowRight className="w-3 h-3" />
             <span>Connect Wallet</span>
           </button>
-          <div 
+                    <div
             className="relative"
-            onMouseEnter={() => setShowNotifications(true)}
-            onMouseLeave={() => setShowNotifications(false)}
           >
-            <button className={`p-2 rounded-full border ${getThemeClasses(currentTheme, 'border')} hover:${getThemeClasses(currentTheme, 'hover')} transition-all duration-200 relative`}>
+            <button 
+              onClick={() => setShowNotifications(!showNotifications)}
+              className={`${getThemeClasses(currentTheme, 'notificationBellButton')} ${getThemeClasses(currentTheme, 'border')}`}
+            >
               <Bell className={`w-4 h-4 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
               {/* Notification dot */}
               <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 ${getThemeClasses(currentTheme, 'notificationDot')}`}></div>
@@ -96,12 +97,12 @@ const Header = () => {
                       Notifications
                     </h3>
                     <div className="flex items-center space-x-4">
-                      <button className={`text-xs ${getThemeClasses(currentTheme, 'textSecondary')} hover:${getThemeClasses(currentTheme, 'textPrimary')} transition-colors duration-200`} style={{ fontSize: '8px' }}>
+                      <button className={`${getThemeClasses(currentTheme, 'notificationClearButton')} ${getThemeClasses(currentTheme, 'textSecondary')}`} style={{ fontSize: '8px' }}>
                         Clear All
                       </button>
                       <button 
                         onClick={() => setShowNotifications(false)}
-                        className={`p-1 rounded hover:${getThemeClasses(currentTheme, 'hover')} transition-colors duration-200`}
+                        className={getThemeClasses(currentTheme, 'notificationCloseButton')}
                       >
                         <X className={`w-4 h-4 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
                       </button>
