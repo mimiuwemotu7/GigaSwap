@@ -39,15 +39,6 @@ const Sidebar = () => {
     // Keep the chat dropdown open
   };
 
-  const handleToggleHistory = (e) => {
-    e.stopPropagation();
-    setShowChatHistory(!showChatHistory);
-  };
-
-  const handleToggleTokens = (e) => {
-    e.stopPropagation();
-    setShowTokensDropdown(!showTokensDropdown);
-  };
 
   // Mock tokens data - same as HoldingsViewer
   const tokens = [
@@ -239,7 +230,7 @@ const Sidebar = () => {
                                   {token.icon}
                                 </div>
                                 <div className={getThemeClasses(currentTheme, 'tokenTextContainer')}>
-                                  <div className={`${getThemeClasses(currentTheme, 'tokenSymbol')} ${getThemeClasses(currentTheme, 'textPrimary')}`}>
+                                  <div className={`${getThemeClasses(currentTheme, 'tokenListSymbol')} ${getThemeClasses(currentTheme, 'textPrimary')}`}>
                                     {token.symbol}
                                   </div>
                                   <div className={`${getThemeClasses(currentTheme, 'tokenName')} ${getThemeClasses(currentTheme, 'textSecondary')}`}>

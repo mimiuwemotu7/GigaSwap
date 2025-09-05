@@ -165,7 +165,7 @@ export const getThemeClasses = (theme, component, variant = 'default') => {
     // Token specific classes
     tokenItemContainer: `p-2 rounded-lg cursor-pointer transition-all duration-200`,
     tokenIconContainer: `w-6 h-6 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-xs font-bold`,
-    tokenSymbol: `text-xs font-medium text-left truncate ${themeColors.textPrimary}`,
+    tokenListSymbol: `text-xs font-medium text-left truncate ${themeColors.textPrimary}`,
     tokenName: `text-xs text-left truncate`,
     tokenPrice: `text-xs font-medium`,
     tokenChange: `text-xs`,
