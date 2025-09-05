@@ -143,9 +143,9 @@ const Header = () => {
                 e.stopPropagation();
                 setShowNotifications(!showNotifications);
               }}
-            className={`relative p-2 rounded-full border transition-all duration-200 flex items-center justify-center ${showNotifications ? 'bg-red-500 border-red-500' : 'bg-transparent border-gray-700 hover:bg-gray-700'}`}
+            className={getThemeClasses(currentTheme, 'notificationBellButton')}
             >
-            <Bell className={`w-4 h-4 ${showNotifications ? 'text-white' : getThemeClasses(currentTheme, 'textSecondary')}`} />
+            <Bell className={getThemeClasses(currentTheme, 'notificationBellIcon')} />
               {/* Notification dot */}
               <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 ${getThemeClasses(currentTheme, 'notificationDot')}`}></div>
             </button>

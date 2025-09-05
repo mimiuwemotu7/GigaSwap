@@ -15,7 +15,7 @@ export const themes = {
       textAccent: 'text-red-400',
       
       // Border colors
-      border: 'border-b border-gray-700',
+      border: 'border-gray-700',
       borderSecondary: 'border-gray-700',
       borderTertiary: 'border-gray-700',
       borderColor: 'border-gray-700',
@@ -53,7 +53,7 @@ export const themes = {
       textAccent: 'text-red-500',
       
       // Border colors
-      border: 'border-b border-gray-700',
+      border: 'border-gray-700',
       borderSecondary: 'border-gray-700',
       borderTertiary: 'border-gray-700',
       borderColor: 'border-gray-700',
@@ -179,7 +179,8 @@ export const getThemeClasses = (theme, component, variant = 'default') => {
     // Notification buttons
     notificationCloseButton: `p-1 rounded transition-colors duration-200 hover:bg-red-500 hover:text-white`,
     notificationClearButton: `text-xs transition-colors duration-200 hover:bg-red-500 hover:text-white px-2 py-1 rounded`,
-    notificationBellButton: `p-2 rounded-full border transition-all duration-200 relative hover:bg-red-500 hover:text-white`,
+    notificationBellButton: `relative p-2 rounded-full border border-red-500 transition-all duration-200 flex items-center justify-center bg-transparent text-red-500 hover:bg-red-500 hover:text-white`,
+    notificationBellIcon: `w-4 h-4`,
     // Layout containers
     listContainer: `space-y-1`,
     tokensDropdown: `max-h-[24vh] overflow-y-auto custom-scrollbar rounded-lg bg-transparent`,
