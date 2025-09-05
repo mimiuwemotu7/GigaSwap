@@ -10,8 +10,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   z-index: 10;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .swap-direction-button:hover {
@@ -22,10 +24,30 @@
   transform: translate(-50%, -50%) scale(0.95);
 }
 
-.swap-icon { display: block; transform-origin: center; transition: transform 0.38s cubic-bezier(.2,.9,.3,1); }
+.swap-icon { 
+  display: block; 
+  transform-origin: center; 
+  transition: transform 0.2s cubic-bezier(.2,.9,.3,1);
+  will-change: transform;
+}
 
 .swap-direction-button.flip .swap-icon { transform: rotate(180deg) scale(1.03); }
 
 /* Removed duplicate hover rule - now handled by theme classes */
 
 .swap-direction-button:active { transform: translate(-50%, -50%) scale(0.98); }
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .swap-direction-button {
+    transition: all 0.15s ease;
+  }
+  
+  .swap-direction-button:active {
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  
+  .swap-icon {
+    transition: transform 0.15s cubic-bezier(.2,.9,.3,1);
+  }
+}

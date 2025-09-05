@@ -85,16 +85,16 @@ const HoldingsViewer = () => {
   };
 
   return (
-    <div className={`max-w-sm mx-auto rounded-xl p-3 shadow-lg ${getThemeClasses(currentTheme, 'container')} border border-gray-800`}>
+    <div className={`w-full max-w-sm md:max-w-sm mx-auto rounded-xl p-3 md:p-3 shadow-lg ${getThemeClasses(currentTheme, 'container')} border border-gray-800`}>
       
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className={`text-lg font-bold ${getThemeClasses(currentTheme, 'textPrimary')}`}>
+      <div className="flex items-center justify-between mb-4 md:mb-4">
+        <h2 className={`text-base md:text-lg font-bold ${getThemeClasses(currentTheme, 'textPrimary')}`}>
           Portfolio Holdings
         </h2>
         <button
           onClick={() => setShowBalances(!showBalances)}
-          className={`p-2 rounded-lg ${getThemeClasses(currentTheme, 'hover')} transition-all duration-200`}
+          className={`p-2 md:p-2 rounded-lg min-h-touch min-w-touch ${getThemeClasses(currentTheme, 'hover')} transition-all duration-200`}
         >
           {showBalances ? (
             <Eye className={`w-4 h-4 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
@@ -105,27 +105,27 @@ const HoldingsViewer = () => {
       </div>
 
       {/* Total Value */}
-      <div className={`mb-4 p-3 rounded-lg ${getThemeClasses(currentTheme, 'section')}`}>
+      <div className={`mb-4 md:mb-4 p-3 md:p-3 rounded-lg ${getThemeClasses(currentTheme, 'section')}`}>
         <div className={`text-sm ${getThemeClasses(currentTheme, 'textSecondary')}`}>Total Portfolio Value</div>
-        <div className={`text-2xl font-bold ${getThemeClasses(currentTheme, 'textPrimary')}`}>
+        <div className={`text-xl md:text-2xl font-bold ${getThemeClasses(currentTheme, 'textPrimary')}`}>
           {formatValue(`$${totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)}
         </div>
       </div>
 
       {/* Holdings List */}
-      <div className="space-y-2">
+      <div className="space-y-3 md:space-y-2">
         {holdings.map((holding) => (
           <div
             key={holding.id}
-            className={`p-3 rounded-lg ${getThemeClasses(currentTheme, 'section')} hover:${getThemeClasses(currentTheme, 'hover')} transition-all duration-200 cursor-pointer`}
+            className={`p-3 md:p-3 rounded-lg ${getThemeClasses(currentTheme, 'section')} hover:${getThemeClasses(currentTheme, 'hover')} transition-all duration-200 cursor-pointer`}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className={`w-8 h-8 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-sm font-bold ${getThemeClasses(currentTheme, 'textPrimary')}`}>
+                <div className={`w-10 h-10 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-sm font-bold ${getThemeClasses(currentTheme, 'textPrimary')}`}>
                   {holding.icon}
                 </div>
                 <div>
-                  <div className={`font-semibold text-left ${getThemeClasses(currentTheme, 'textPrimary')}`}>
+                  <div className={`font-semibold text-left text-sm md:text-base ${getThemeClasses(currentTheme, 'textPrimary')}`}>
                     {holding.symbol}
                   </div>
                   <div className={`text-xs text-left ${getThemeClasses(currentTheme, 'textSecondary')}`}>
@@ -134,9 +134,9 @@ const HoldingsViewer = () => {
                 </div>
               </div>
               
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 md:space-x-3">
                 <div className="text-right">
-                  <div className={`font-semibold ${getThemeClasses(currentTheme, 'textPrimary')}`}>
+                  <div className={`font-semibold text-sm md:text-base ${getThemeClasses(currentTheme, 'textPrimary')}`}>
                     {formatValue(holding.value)}
                   </div>
                   <div className={`text-xs ${getThemeClasses(currentTheme, 'textSecondary')}`}>
@@ -154,7 +154,7 @@ const HoldingsViewer = () => {
                 
                 <button 
                   onClick={() => handleSwap(holding)}
-                  className={`px-3 py-1 rounded-lg border ${getThemeClasses(currentTheme, 'border')} text-sm font-medium ${getThemeClasses(currentTheme, 'textPrimary')} hover:bg-red-500 hover:text-white hover:border-gray-800 transition-all duration-200`}
+                  className={`px-3 py-2 md:px-3 md:py-1 rounded-lg border min-h-touch ${getThemeClasses(currentTheme, 'border')} text-sm font-medium ${getThemeClasses(currentTheme, 'textPrimary')} hover:bg-red-500 hover:text-white hover:border-gray-800 transition-all duration-200`}
                 >
                   Swap
                 </button>
@@ -165,7 +165,7 @@ const HoldingsViewer = () => {
       </div>
 
       {/* Footer */}
-      <div className={`mt-3 text-center text-xs ${getThemeClasses(currentTheme, 'footer')}`}>
+      <div className={`mt-4 md:mt-3 text-center text-xs ${getThemeClasses(currentTheme, 'footer')}`}>
         Last updated: {new Date().toLocaleTimeString()}
       </div>
     </div>

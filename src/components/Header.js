@@ -1,163 +1,332 @@
 import React, { useState } from 'react';
-import { ArrowRight, User, Bell, X, TrendingUp, CheckCircle } from 'lucide-react';
+import { User, Bell, Menu, Wallet, MessageCircle, Coins, ChevronDown, Plus, Trash2, Clock, X } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import { useChat } from '../contexts/ChatContext';
 import { getThemeClasses } from '../themes/themeConfig';
 import ThemeSelector from './ThemeSelector';
+import NotificationCard from './NotificationCard';
 
 const Header = () => {
   const { currentTheme } = useTheme();
+  const { currentChatId, setCurrentChatId, createNewChat, deleteChat, chatHistory } = useChat();
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const [activeItem, setActiveItem] = useState('chats');
+  const [showChatHistory, setShowChatHistory] = useState(false);
+  const [showTokensDropdown, setShowTokensDropdown] = useState(false);
 
-  // Mock notification data
-  const notifications = [
+  // Helper functions from Sidebar
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInHours = (now - date) / (1000 * 60 * 60);
+    
+    if (diffInHours < 1) {
+      return 'Just now';
+    } else if (diffInHours < 24) {
+      return `${Math.floor(diffInHours)}h ago`;
+    } else if (diffInHours < 168) { // 7 days
+      return `${Math.floor(diffInHours / 24)}d ago`;
+    } else {
+      return date.toLocaleDateString();
+    }
+  };
+
+  const getChatPreview = (messages) => {
+    if (messages.length === 0) return 'New chat';
+    const lastMessage = messages[messages.length - 1];
+    return lastMessage.text;
+  };
+
+  const handleNewChat = (e) => {
+    e.stopPropagation();
+    createNewChat();
+  };
+
+  // Mock tokens data
+  const tokens = [
     {
       id: 1,
-      type: 'success',
-      title: '35.99 Solana USDC Received!',
-      message: 'You now have 35.99 USDC on Solana.',
-      time: '6d ago',
-      icon: CheckCircle,
-      action: 'Convert'
+      symbol: 'ETH',
+      name: 'Ethereum',
+      icon: '⟠',
+      price: '$1,728.45',
+      change24h: '+5.23%',
+      isPositive: true,
+      color: 'text-blue-400',
+      contractAddress: '0xA0b86a33E6441c8C06DDD4C4c4c4c4c4c4c4c4c4c'
     },
     {
       id: 2,
-      type: 'success',
-      title: '68.65 Solana USDC Received!',
-      message: 'You now have 68.65 USDC on Solana.',
-      time: '6d ago',
-      icon: CheckCircle,
-      action: 'Convert'
+      symbol: 'SOL',
+      name: 'Solana',
+      icon: '◎',
+      price: '$85.92',
+      change24h: '+2.15%',
+      isPositive: true,
+      color: 'text-purple-400',
+      contractAddress: 'So11111111111111111111111111111111111111112'
     },
     {
       id: 3,
-      type: 'referral',
-      title: '1x Referral Used!',
-      message: 'j******* used your referral code',
-      time: '1mo ago',
-      icon: User,
-      color: 'text-white',
-      action: 'View'
+      symbol: 'USDC',
+      name: 'USD Coin',
+      icon: '$',
+      price: '$1.00',
+      change24h: '+0.01%',
+      isPositive: true,
+      color: 'text-green-400',
+      contractAddress: '0xA0b86a33E6441c8C06DDD4C4c4c4c4c4c4c4c4c4c'
     },
     {
       id: 4,
-      type: 'points',
-      title: '2000 Axiom Points Earned!',
-      message: 'Keep trading to earn more!',
-      time: '1mo ago',
-      icon: TrendingUp,
-      color: 'text-white',
-      action: 'Claim'
-    },
-    {
-      id: 5,
-      type: 'points',
-      title: '20000 Axiom Points Earned!',
-      message: 'Keep trading to earn more!',
-      time: '2mo ago',
-      icon: TrendingUp,
-      color: 'text-white',
-      action: 'Claim'
+      symbol: 'BTC',
+      name: 'Bitcoin',
+      icon: '₿',
+      price: '$65,872.96',
+      change24h: '-1.45%',
+      isPositive: false,
+      color: 'text-orange-400',
+      contractAddress: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599'
     }
   ];
+
+  // Swipe detection functions
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    
+    if (isLeftSwipe && showMobileMenu) {
+      setShowMobileMenu(false);
+    }
+  };
+
 
   return (
     <header className={`w-full py-4 px-6 ${getThemeClasses(currentTheme, 'headerContainer')}`}>
       <div className="w-full flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <img src="/icon2.png" alt="GigaSwap" className="w-8 h-8" />
-          <h1 className={`text-2xl font-bold ${getThemeClasses(currentTheme, 'headerTitle')}`}>
+          <h1 className={`hidden md:block text-lg md:text-xl font-bold ${getThemeClasses(currentTheme, 'headerTitle')}`}>
             GigaSwap
           </h1>
         </div>
-        <div className="flex items-center space-x-4">
-          <button className={`flex items-center space-x-1 px-3 py-1 border rounded transition-all duration-200 text-sm font-medium ${getThemeClasses(currentTheme, 'connectWalletButton')}`}>
-            <ArrowRight className="w-3 h-3" />
-            <span>Connect Wallet</span>
+        <div className="flex items-center space-x-2 md:space-x-4">
+          {/* Compact Connect Wallet Button */}
+          <button className={`p-2 rounded-full border transition-all duration-200 bg-transparent flex items-center justify-center ${getThemeClasses(currentTheme, 'connectWalletButton')}`}>
+            <Wallet className={`w-4 h-4`} />
           </button>
-                    <div
-            className="relative"
-          >
+          
+          {/* Notifications Bell */}
             <button 
-              onClick={() => setShowNotifications(!showNotifications)}
-              className={`${getThemeClasses(currentTheme, 'notificationBellButton')} ${getThemeClasses(currentTheme, 'border')}`}
+              data-notification-bell
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowNotifications(!showNotifications);
+              }}
+            className={`relative p-2 rounded-full border transition-all duration-200 flex items-center justify-center ${showNotifications ? 'bg-red-500 border-red-500' : 'bg-transparent border-gray-700 hover:bg-gray-700'}`}
             >
-              <Bell className={`w-4 h-4 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
+            <Bell className={`w-4 h-4 ${showNotifications ? 'text-white' : getThemeClasses(currentTheme, 'textSecondary')}`} />
               {/* Notification dot */}
               <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 ${getThemeClasses(currentTheme, 'notificationDot')}`}></div>
             </button>
             
             {/* Notification Card */}
-            {showNotifications && (
-              <div className={`absolute right-0 top-full mt-2 w-80 p-4 ${getThemeClasses(currentTheme, 'notificationCard')} rounded-lg z-50`}>
-                {/* Header */}
-                <div className={`pb-4 ${getThemeClasses(currentTheme, 'border')}`}>
-                  <div className="flex items-center justify-between">
-                    <h3 className={`text-xs font-semibold ${getThemeClasses(currentTheme, 'textPrimary')}`} style={{ fontSize: '10px' }}>
-                      Notifications
-                    </h3>
-                    <div className="flex items-center space-x-4">
-                      <button className={`${getThemeClasses(currentTheme, 'notificationClearButton')} ${getThemeClasses(currentTheme, 'textSecondary')}`} style={{ fontSize: '8px' }}>
-                        Clear All
-                      </button>
-                      <button 
-                        onClick={() => setShowNotifications(false)}
-                        className={getThemeClasses(currentTheme, 'notificationCloseButton')}
-                      >
-                        <X className={`w-4 h-4 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Notifications List */}
-                <div className="max-h-96 overflow-y-auto">
-                  {notifications.map((notification) => {
-                    const IconComponent = notification.icon;
-                    return (
-                      <div
-                        key={notification.id}
-                        onClick={() => setSelectedNotification(selectedNotification === notification.id ? null : notification.id)}
-                        className={`py-4 ${getThemeClasses(currentTheme, 'notificationDivider')} hover:${getThemeClasses(currentTheme, 'hover')} transition-colors duration-200 cursor-pointer ${selectedNotification === notification.id ? getThemeClasses(currentTheme, 'notificationSelected') : ''}`}
-                      >
-                        <div className="flex items-start space-x-3">
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center ${notification.type === 'success' ? getThemeClasses(currentTheme, 'notificationIconSuccess') : getThemeClasses(currentTheme, 'notificationIconDefault')}`}>
-                            <IconComponent className={`w-3 h-3 ${notification.color}`} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1 min-w-0">
-                                <div className={`text-xs font-semibold ${getThemeClasses(currentTheme, 'textPrimary')}`} style={{ fontSize: '10px' }}>
-                                  {notification.title}
-                                </div>
-                                <div className={`text-xs mt-1 ${getThemeClasses(currentTheme, 'textSecondary')}`} style={{ fontSize: '8px' }}>
-                                  {notification.message}
-                                </div>
-                              </div>
-                              <div className="flex flex-col items-end space-y-1 ml-2">
-                                <div className={`text-xs ${getThemeClasses(currentTheme, 'notificationTimestamp')}`} style={{ fontSize: '7px' }}>
-                                  {notification.time}
-                                </div>
-                                {notification.action && (
-                                  <button className={`text-xs font-medium ${getThemeClasses(currentTheme, 'notificationAction')} hover:underline transition-colors duration-200`} style={{ fontSize: '7px' }}>
-                                    {notification.action}
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-          <button className={`p-2 rounded-full border transition-all duration-200 ${getThemeClasses(currentTheme, 'userButton')}`}>
+            <NotificationCard 
+              showNotifications={showNotifications}
+              setShowNotifications={setShowNotifications}
+              selectedNotification={selectedNotification}
+              setSelectedNotification={setSelectedNotification}
+            />
+            
+          <button className={`hidden md:block p-2 rounded-full border transition-all duration-200 bg-transparent flex items-center justify-center ${getThemeClasses(currentTheme, 'userButton')}`}>
             <User className={`w-4 h-4 ${getThemeClasses(currentTheme, 'userButtonIcon')}`} />
           </button>
           <ThemeSelector />
+          {/* Mobile hamburger menu button - moved to right side */}
+          <button 
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            className={`md:hidden p-2 rounded-lg touch-feedback bg-transparent flex items-center justify-center ${getThemeClasses(currentTheme, 'hover')} transition-all duration-200`}
+          >
+            <Menu className={`w-5 h-5 ${getThemeClasses(currentTheme, 'textPrimary')}`} />
+          </button>
+        </div>
+      </div>
+      
+      {/* Mobile Side Drawer */}
+      <div className={`md:hidden fixed inset-0 z-40 ${
+        showMobileMenu ? 'pointer-events-auto' : 'pointer-events-none'
+      }`}>
+        {/* Backdrop */}
+        <div 
+          className={`fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300 ${
+            showMobileMenu ? 'opacity-100' : 'opacity-0'
+          }`}
+          onClick={() => setShowMobileMenu(false)}
+        />
+        
+        {/* Side Drawer */}
+        <div 
+          className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] z-50 slide-drawer-right ${
+            showMobileMenu ? 'open' : ''
+          }`}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
+            <div className={`h-full ${getThemeClasses(currentTheme, 'headerContainer')} border-l ${getThemeClasses(currentTheme, 'border')} shadow-xl`}>
+              {/* Drawer Header */}
+              <div className="flex items-center justify-between p-4 border-b border-gray-700">
+                <button 
+                  onClick={() => setShowMobileMenu(false)}
+                  className={`p-2 rounded-lg touch-feedback ${getThemeClasses(currentTheme, 'hover')} transition-all duration-200`}
+                >
+                  <X className={`w-5 h-5 ${getThemeClasses(currentTheme, 'textPrimary')}`} />
+                </button>
+                <h2 className={`text-base md:text-lg font-bold ${getThemeClasses(currentTheme, 'headerTitle')}`}>
+                  Menu
+                </h2>
+              </div>
+              
+              {/* Drawer Content */}
+              <div className="p-4 space-y-4 overflow-y-auto h-[calc(100vh-80px)]">
+                {/* Profile */}
+                <div className="space-y-2">
+                  <button className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg ${getThemeClasses(currentTheme, 'hover')} transition-all duration-200`}>
+                    <User className={`w-5 h-5 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
+                    <span className={`${getThemeClasses(currentTheme, 'textPrimary')} font-medium text-sm md:text-base`}>Profile</span>
+                  </button>
+                </div>
+
+                {/* Chats Section */}
+                <div className="space-y-2">
+                  <button 
+                    onClick={() => {
+                      setActiveItem('chats');
+                      setShowChatHistory(!showChatHistory);
+                    }}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-lg ${getThemeClasses(currentTheme, 'hover')} transition-all duration-200`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <MessageCircle className={`w-5 h-5 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
+                      <span className={`${getThemeClasses(currentTheme, 'textPrimary')} font-medium text-sm md:text-base`}>Chats</span>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 ${getThemeClasses(currentTheme, 'textSecondary')} transition-transform duration-200 ${showChatHistory ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {/* Chat History */}
+                  {showChatHistory && (
+                    <div className="ml-4 space-y-1">
+                      <button
+                        onClick={handleNewChat}
+                        className={`w-full flex items-center space-x-2 px-3 py-2 rounded-lg border border-dashed ${getThemeClasses(currentTheme, 'border')} ${getThemeClasses(currentTheme, 'hover')} transition-all duration-200`}
+                      >
+                        <Plus className={`w-4 h-4 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
+                        <span className={`${getThemeClasses(currentTheme, 'textPrimary')} text-xs md:text-sm`}>New Chat</span>
+                      </button>
+                      
+                      {chatHistory.map((chat) => (
+                        <div
+                          key={chat.id}
+                          className={`flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-colors duration-200 ${
+                            currentChatId === chat.id 
+                              ? `${getThemeClasses(currentTheme, 'tertiary')} border border-gray-800` 
+                              : `${getThemeClasses(currentTheme, 'hover')}`
+                          }`}
+                          onClick={() => setCurrentChatId(chat.id)}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className={`text-xs md:text-sm ${getThemeClasses(currentTheme, 'textPrimary')} truncate text-left`}>
+                              {getChatPreview(chat.messages)}
+                            </div>
+                            <div className={`text-[10px] md:text-xs ${getThemeClasses(currentTheme, 'textSecondary')} flex items-center space-x-1 text-left`}>
+                              <Clock className="w-3 h-3" />
+                              <span>{formatDate(chat.lastUpdated)}</span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteChat(chat.id);
+                            }}
+                            className={`p-1 rounded transition-colors duration-200 hover:bg-red-500 hover:text-white`}
+                          >
+                            <Trash2 className={`w-3 h-3 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Tokens Section */}
+                <div className="space-y-2">
+                  <button 
+                    onClick={() => {
+                      setActiveItem('tokens');
+                      setShowTokensDropdown(!showTokensDropdown);
+                    }}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-lg ${getThemeClasses(currentTheme, 'hover')} transition-all duration-200`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Coins className={`w-5 h-5 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
+                      <span className={`${getThemeClasses(currentTheme, 'textPrimary')} font-medium`}>Tokens</span>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 ${getThemeClasses(currentTheme, 'textSecondary')} transition-transform duration-200 ${showTokensDropdown ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {/* Tokens List */}
+                  {showTokensDropdown && (
+                    <div className="ml-4 space-y-1">
+                      {tokens.map((token) => (
+                        <div
+                          key={token.id}
+                          className={`flex items-center justify-between px-3 py-2 rounded-lg ${getThemeClasses(currentTheme, 'hover')} transition-all duration-200`}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className={`w-6 h-6 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-xs font-bold ${getThemeClasses(currentTheme, 'textPrimary')}`}>
+                              {token.icon}
+                            </div>
+                            <div>
+                              <div className={`text-sm font-medium ${getThemeClasses(currentTheme, 'textPrimary')}`}>
+                                {token.symbol}
+                              </div>
+                              <div className={`text-xs ${getThemeClasses(currentTheme, 'textSecondary')}`}>
+                                {token.name}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className={`text-sm font-medium ${getThemeClasses(currentTheme, 'textPrimary')}`}>
+                              {token.price}
+                            </div>
+                            <div className={`text-xs ${token.isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                              {token.change24h}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
         </div>
       </div>
     </header>

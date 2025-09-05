@@ -15,10 +15,12 @@ const AppContent = () => {
         <Header />
       </div>
       <div className="flex h-[calc(100vh-4rem)] pt-16">
-        <div className="fixed left-0 top-16 bottom-0 z-40">
+        {/* Sidebar - Hidden on mobile, visible on md and up */}
+        <div className="hidden md:block fixed left-0 top-16 bottom-0 z-40">
           <Sidebar />
         </div>
-        <main className="flex-1 ml-64 relative h-[calc(100vh-4rem)]">
+        {/* Main content area - Full width on mobile, with margin on desktop */}
+        <main className="flex-1 md:ml-64 relative h-[calc(100vh-4rem)] w-full">
           <ChatArea messages={messages} isTyping={isTyping} />
         </main>
       </div>

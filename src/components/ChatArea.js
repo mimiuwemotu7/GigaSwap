@@ -38,21 +38,21 @@ const ChatArea = ({ messages = [], isTyping = false }) => {
   return (
     <div className={`h-full flex flex-col ${getThemeClasses(currentTheme, 'chatArea')}`}>
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-2 md:p-4">
         {messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
+          <div className="flex items-center justify-center h-full px-4">
+            <div className="text-center w-full max-w-sm">
               <div className="mb-4">
-                <img src="/icon1.png" alt="AI Assistant" className="w-[25%] h-auto mx-auto" />
+                <img src="/icon1.png" alt="AI Assistant" className="w-40 md:w-24 h-auto mx-auto" />
               </div>
               
               {/* Comic Speech Bubble */}
-              <div className="relative inline-block">
-                <div className={`relative border-2 ${getThemeClasses(currentTheme, 'border')} rounded-2xl px-6 py-4 shadow-lg max-w-sm mx-auto`}>
-                  <div className={`text-lg font-bold ${getThemeClasses(currentTheme, 'textPrimary')}`}>
+              <div className="relative inline-block w-full max-w-64 md:max-w-sm">
+                <div className={`relative border-2 ${getThemeClasses(currentTheme, 'border')} rounded-2xl px-3 md:px-6 py-2 md:py-4 shadow-lg w-full`}>
+                  <div className={`text-sm md:text-lg font-bold ${getThemeClasses(currentTheme, 'textPrimary')}`}>
                     What's good chad,
                   </div>
-                  <div className={`text-sm mt-1 ${getThemeClasses(currentTheme, 'textSecondary')}`}>
+                  <div className={`text-xs md:text-sm mt-1 ${getThemeClasses(currentTheme, 'textSecondary')}`}>
                     ready to make some money?
                   </div>
                   
@@ -65,7 +65,7 @@ const ChatArea = ({ messages = [], isTyping = false }) => {
             </div>
           </div>
         ) : (
-          <div className="space-y-6 pl-6 pr-6 py-4">
+          <div className="space-y-4 md:space-y-6 px-2 md:px-6 py-2 md:py-4">
             {messages.map((message, index) => (
               <div
                 key={index}
@@ -77,36 +77,36 @@ const ChatArea = ({ messages = [], isTyping = false }) => {
               >
                 {message.type === 'user' ? (
                   <div className="w-full flex justify-end">
-                    <div className="flex flex-col items-end">
-                      {/* User Avatar with message text */}
-                      <div className="px-3 py-2 rounded-lg bg-gray-600 flex items-center justify-center text-white text-xs font-medium mb-2">
+                    <div className="flex flex-col items-end max-w-[85%] md:max-w-lg">
+                      {/* User Message */}
+                      <div className="px-3 py-2 rounded-lg bg-gray-600 text-white text-xs md:text-sm font-medium mb-1 md:mb-2 break-words">
                         {message.text}
                       </div>
-                      {/* User Message */}
+                      {/* User Message Time */}
                       <div className="flex flex-col items-end">
-                        <div className={`${getThemeClasses(currentTheme, 'chatMessageTime')} text-right`}>
+                        <div className={`${getThemeClasses(currentTheme, 'chatMessageTime')} text-right text-[10px] md:text-xs`}>
                           {formatTime(message.timestamp)}
                         </div>
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-start space-x-3">
+                  <div className="flex items-start space-x-2 md:space-x-3">
                     {/* Bot Avatar */}
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden">
-                      <img src="/icon1.png" alt="AI Assistant" className="w-8 h-8" />
+                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      <img src="/icon1.png" alt="AI Assistant" className="w-6 h-6 md:w-8 md:h-8" />
                     </div>
                     {/* Bot Message */}
-                    <div className="flex flex-col items-start max-w-lg">
-                      <div className={`px-3 py-2 rounded-lg bg-red-500 ${getThemeClasses(currentTheme, 'chatMessageText')} text-left text-white`}>
+                    <div className="flex flex-col items-start max-w-[85%] md:max-w-lg">
+                      <div className={`px-3 py-2 rounded-lg bg-red-500 ${getThemeClasses(currentTheme, 'chatMessageText')} text-left text-white text-xs md:text-sm break-words`}>
                         {message.text}
                       </div>
                       {message.component && (
-                        <div className="mt-3 w-full">
+                        <div className="mt-2 md:mt-3 w-full">
                           {renderComponent(message.component)}
                         </div>
                       )}
-                      <div className={`${getThemeClasses(currentTheme, 'chatMessageTime')} mt-1`}>
+                      <div className={`${getThemeClasses(currentTheme, 'chatMessageTime')} mt-1 text-[10px] md:text-xs`}>
                         {formatTime(message.timestamp)}
                       </div>
                     </div>

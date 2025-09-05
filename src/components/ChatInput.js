@@ -43,16 +43,16 @@ const ChatInput = () => {
   };
 
   return (
-    <div className="p-4 bg-inherit">
-      <div className={`p-4 ${getThemeClasses(currentTheme, 'chatInput')}`}>
+    <div className="p-2 md:p-4 bg-inherit">
+      <div className={`p-3 md:p-4 ${getThemeClasses(currentTheme, 'chatInput')}`}>
         {!hasMessages ? (
           // Initial layout - buttons above input
           <>
-            <div className="flex items-center space-x-3 mb-3">
+            <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-3 mb-3">
               {/* Model Selector */}
               <button 
                 onClick={() => sendMessage('swap')}
-                className={`${getThemeClasses(currentTheme, 'chatSelector')} cursor-pointer`}
+                className={`${getThemeClasses(currentTheme, 'chatSelector')} cursor-pointer min-h-touch w-full md:w-auto`}
               >
                 <span className={`${getThemeClasses(currentTheme, 'chatSelectorText')}`}>
                   {models.find(m => m.id === selectedModel)?.name || 'Swap'}
@@ -62,7 +62,7 @@ const ChatInput = () => {
               {/* Network Selector */}
               <button 
                 onClick={() => sendMessage('holdings')}
-                className={`${getThemeClasses(currentTheme, 'chatSelector')} cursor-pointer`}
+                className={`${getThemeClasses(currentTheme, 'chatSelector')} cursor-pointer min-h-touch w-full md:w-auto`}
               >
                 <span className={`${getThemeClasses(currentTheme, 'chatSelectorText')}`}>
                   {networks.find(n => n.id === selectedNetwork)?.name || 'Holdings'}
@@ -71,63 +71,82 @@ const ChatInput = () => {
             </div>
 
             {/* Input Field */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 md:space-x-3">
               <input
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask the hive anything..."
-                className={`flex-1 py-3 px-4 rounded-lg outline-none focus:outline-none focus:ring-2 focus:ring-red-400/50 ${getThemeClasses(currentTheme, 'chatInputField')}`}
+                className={`flex-1 py-3 md:py-3 px-3 md:px-4 rounded-lg outline-none focus:outline-none focus:ring-2 focus:ring-red-400/50 text-base ${getThemeClasses(currentTheme, 'chatInputField')}`}
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
+                enterKeyHint="send"
+                inputMode="text"
+                maxLength={500}
               />
               <button
                 onClick={handleSend}
                 disabled={!message.trim()}
-                className={`${getThemeClasses(currentTheme, 'chatSendButton')} ${!message.trim() ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
+                className={`${getThemeClasses(currentTheme, 'chatSendButton')} min-h-touch min-w-touch ${!message.trim() ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
               >
                 <Send className={`w-5 h-5 ${getThemeClasses(currentTheme, 'chatSendIcon')}`} />
               </button>
             </div>
           </>
         ) : (
-          // After first message - buttons on same line as input
-          <div className="flex items-center space-x-3">
-            {/* Model Selector */}
-            <button 
-              onClick={() => sendMessage('swap')}
-              className={`${getThemeClasses(currentTheme, 'chatSelector')} cursor-pointer`}
-            >
-              <span className={`${getThemeClasses(currentTheme, 'chatSelectorText')}`}>
-                {models.find(m => m.id === selectedModel)?.name || 'Swap'}
-              </span>
-            </button>
+          // After first message - compact layout for mobile
+          <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-3">
+            {/* Mobile: Stack buttons above input, Desktop: Keep inline */}
+            <div className="flex items-center space-x-2 md:space-x-3 w-full md:w-auto">
+              {/* Model Selector */}
+              <button 
+                onClick={() => sendMessage('swap')}
+                className={`${getThemeClasses(currentTheme, 'chatSelector')} cursor-pointer min-h-touch flex-1 md:flex-none`}
+              >
+                <span className={`${getThemeClasses(currentTheme, 'chatSelectorText')}`}>
+                  {models.find(m => m.id === selectedModel)?.name || 'Swap'}
+                </span>
+              </button>
 
-            {/* Network Selector */}
-            <button 
-              onClick={() => sendMessage('holdings')}
-              className={`${getThemeClasses(currentTheme, 'chatSelector')} cursor-pointer`}
-            >
-              <span className={`${getThemeClasses(currentTheme, 'chatSelectorText')}`}>
-                {networks.find(n => n.id === selectedNetwork)?.name || 'Holdings'}
-              </span>
-            </button>
+              {/* Network Selector */}
+              <button 
+                onClick={() => sendMessage('holdings')}
+                className={`${getThemeClasses(currentTheme, 'chatSelector')} cursor-pointer min-h-touch flex-1 md:flex-none`}
+              >
+                <span className={`${getThemeClasses(currentTheme, 'chatSelectorText')}`}>
+                  {networks.find(n => n.id === selectedNetwork)?.name || 'Holdings'}
+                </span>
+              </button>
+            </div>
 
             {/* Input Field */}
-            <input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Ask the hive anything..."
-              className={`flex-1 py-3 px-4 rounded-lg outline-none focus:outline-none focus:ring-2 focus:ring-red-400/50 ${getThemeClasses(currentTheme, 'chatInputField')}`}
-            />
-            <button
-              onClick={handleSend}
-              disabled={!message.trim()}
-              className={`${getThemeClasses(currentTheme, 'chatSendButton')} ${!message.trim() ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
-            >
-              <Send className={`w-5 h-5 ${getThemeClasses(currentTheme, 'chatSendIcon')}`} />
-            </button>
+            <div className="flex items-center space-x-2 md:space-x-3 w-full md:w-auto">
+              <input
+                type="text"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Ask the hive anything..."
+                className={`flex-1 py-3 md:py-3 px-3 md:px-4 rounded-lg outline-none focus:outline-none focus:ring-2 focus:ring-red-400/50 text-base ${getThemeClasses(currentTheme, 'chatInputField')}`}
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
+                enterKeyHint="send"
+                inputMode="text"
+                maxLength={500}
+              />
+              <button
+                onClick={handleSend}
+                disabled={!message.trim()}
+                className={`${getThemeClasses(currentTheme, 'chatSendButton')} min-h-touch min-w-touch ${!message.trim() ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
+              >
+                <Send className={`w-5 h-5 ${getThemeClasses(currentTheme, 'chatSendIcon')}`} />
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -145,7 +145,7 @@ const Sidebar = () => {
                 
                 {/* Chat History - appears directly under the Chats button */}
                 {item.id === 'chats' && (
-                  <div className={`ml-4 mt-2 overflow-hidden transition-all duration-300 ease-in-out bg-transparent ${
+                  <div className={`ml-4 mt-2 overflow-hidden bg-transparent transition-all duration-300 ease-in-out ${
                     showChatHistory ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                   }`}>
                   <div className={`${getThemeClasses(currentTheme, 'listContainer')} ${getThemeClasses(currentTheme, 'chatHistoryDropdown')}`}>
@@ -211,7 +211,7 @@ const Sidebar = () => {
                 
                 {/* Tokens List - appears directly under the Tokens button */}
                 {item.id === 'tokens' && (
-                  <div className={`ml-4 mt-2 overflow-hidden transition-all duration-300 ease-in-out bg-transparent ${
+                  <div className={`ml-4 mt-2 overflow-hidden bg-transparent transition-all duration-300 ease-in-out ${
                     showTokensDropdown ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                   }`}>
                     <div className={`${getThemeClasses(currentTheme, 'listContainer')} ${getThemeClasses(currentTheme, 'tokensDropdown')}`}>

@@ -56,7 +56,7 @@ const CryptoSwapComponent = () => {
   };
 
   const TokenSelector = ({ token, onSelect, type }) => (
-    <div className={`${getThemeClasses(currentTheme, 'tokenSelector')} px-3 py-2 min-w-[120px]`}>
+    <div className={`${getThemeClasses(currentTheme, 'tokenSelector')} px-3 py-3 md:py-2 min-w-[120px] min-h-touch`}>
       <div className={`${getThemeClasses(currentTheme, 'tokenIcon')}`}>
         {token.icon}
       </div>
@@ -82,11 +82,13 @@ const CryptoSwapComponent = () => {
           value={amount}
           onChange={handleInputChange}
           placeholder={placeholder}
-          className={`w-full text-xl font-bold outline-none focus:outline-none ${getThemeClasses(currentTheme, 'input')}`}
+          className={`w-full text-lg md:text-xl font-bold outline-none focus:outline-none py-2 md:py-0 ${getThemeClasses(currentTheme, 'input')}`}
           autoComplete="off"
           spellCheck="false"
           autoCorrect="off"
           autoCapitalize="off"
+          enterKeyHint="done"
+          maxLength={20}
         />
         <div className={`text-sm mt-1 text-left ${getThemeClasses(currentTheme, 'inputValue')}`}>
           ${type === 'from' ? (amount && parseFloat(amount) > 0 ? (parseFloat(amount) * 2847.32).toFixed(2) : '0.00') : (amount && parseFloat(amount) > 0 ? parseFloat(amount).toFixed(2) : '0.00')}
@@ -96,13 +98,13 @@ const CryptoSwapComponent = () => {
   };
 
   return (
-    <div className={`max-w-sm mx-auto rounded-xl p-3 shadow-lg ${getThemeClasses(currentTheme, 'container')} border border-gray-800`}>
+    <div className={`w-full max-w-sm md:max-w-sm mx-auto rounded-xl p-3 md:p-3 shadow-lg ${getThemeClasses(currentTheme, 'container')} border border-gray-800`}>
 
 
       {/* From Section */}
-      <div className="mb-1">
-        <div className={`rounded-xl p-3 ${getThemeClasses(currentTheme, 'section')}`}>
-          <div className="flex justify-between items-center mb-2">
+      <div className="mb-2 md:mb-1">
+        <div className={`rounded-xl p-3 md:p-3 ${getThemeClasses(currentTheme, 'section')}`}>
+          <div className="flex justify-between items-center mb-3 md:mb-2">
             <span className={`font-medium text-sm ${getThemeClasses(currentTheme, 'label')}`}>From</span>
             <span className={`text-xs ${getThemeClasses(currentTheme, 'balance')}`}>Balance: {tokens.find(t => t.symbol === fromToken.symbol)?.balance}</span>
           </div>
@@ -121,19 +123,19 @@ const CryptoSwapComponent = () => {
       </div>
 
       {/* Swap Button */}
-      <div className="flex justify-center mb-1 relative z-10">
+      <div className="flex justify-center mb-2 md:mb-1 relative z-10">
         <button
           onClick={handleSwapTokens}
-          className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 ${getThemeClasses(currentTheme, 'swapButton')}`}
+          className={`w-14 h-14 md:w-12 md:h-12 rounded-xl flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 ${getThemeClasses(currentTheme, 'swapButton')}`}
         >
           <ArrowUpDown className={`w-6 h-6 ${getThemeClasses(currentTheme, 'swapIcon')}`} />
         </button>
       </div>
 
       {/* To Section */}
-      <div className="mb-2">
-        <div className={`rounded-xl p-3 ${getThemeClasses(currentTheme, 'section')}`}>
-          <div className="flex justify-between items-center mb-2">
+      <div className="mb-3 md:mb-2">
+        <div className={`rounded-xl p-3 md:p-3 ${getThemeClasses(currentTheme, 'section')}`}>
+          <div className="flex justify-between items-center mb-3 md:mb-2">
             <span className={`font-medium text-sm ${getThemeClasses(currentTheme, 'label')}`}>To</span>
             <span className={`text-xs ${getThemeClasses(currentTheme, 'balance')}`}>Balance: {tokens.find(t => t.symbol === toToken.symbol)?.balance}</span>
           </div>
@@ -153,12 +155,12 @@ const CryptoSwapComponent = () => {
 
       {/* Swap Info */}
       {fromAmount && (
-        <div className={`mb-2 rounded-lg p-2 ${getThemeClasses(currentTheme, 'infoSection')}`}>
-          <div className="flex justify-between text-xs mb-1">
+        <div className={`mb-3 md:mb-2 rounded-lg p-3 md:p-2 ${getThemeClasses(currentTheme, 'infoSection')}`}>
+          <div className="flex justify-between text-xs mb-2 md:mb-1">
             <span className={getThemeClasses(currentTheme, 'infoText')}>Rate</span>
             <span className={getThemeClasses(currentTheme, 'infoValue')}>1 {fromToken.symbol} = 1,850.42 {toToken.symbol}</span>
           </div>
-          <div className="flex justify-between text-xs mb-1">
+          <div className="flex justify-between text-xs mb-2 md:mb-1">
             <span className={getThemeClasses(currentTheme, 'infoText')}>Network fee</span>
             <span className={getThemeClasses(currentTheme, 'infoValue')}>~$12.45</span>
           </div>
@@ -172,7 +174,7 @@ const CryptoSwapComponent = () => {
       {/* Swap Button */}
       <button 
         disabled={!fromAmount || parseFloat(fromAmount) === 0}
-        className={`${getThemeClasses(currentTheme, 'actionButton')} ${
+        className={`${getThemeClasses(currentTheme, 'actionButton')} min-h-touch ${
           fromAmount && parseFloat(fromAmount) > 0
             ? getThemeClasses(currentTheme, 'actionButtonEnabled')
             : getThemeClasses(currentTheme, 'actionButtonDisabled')
