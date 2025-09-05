@@ -95,9 +95,9 @@ const Header = () => {
             
             {/* Notification Card */}
             {showNotifications && (
-              <div className={`absolute right-0 top-full mt-2 w-80 p-4 bg-[#1f1f1f] rounded-lg border-gray-800 border shadow-lg z-50`}>
+              <div className={`absolute right-0 top-full mt-2 w-80 p-4 ${getThemeClasses(currentTheme, 'card')} rounded-lg ${getThemeClasses(currentTheme, 'border')} border shadow-lg z-50`}>
                 {/* Header */}
-                <div className={`pb-4 border-b border-gray-800`}>
+                <div className={`pb-4 border-b ${getThemeClasses(currentTheme, 'border')}`}>
                   <div className="flex items-center justify-between">
                     <h3 className={`text-xs font-semibold ${getThemeClasses(currentTheme, 'textPrimary')}`} style={{ fontSize: '10px' }}>
                       Notifications
@@ -124,7 +124,7 @@ const Header = () => {
                       <div
                         key={notification.id}
                         onClick={() => setSelectedNotification(selectedNotification === notification.id ? null : notification.id)}
-                        className={`py-4 border-b border-gray-800 hover:${getThemeClasses(currentTheme, 'hover')} transition-colors duration-200 cursor-pointer ${selectedNotification === notification.id ? 'border-l-4 border-l-gray-800' : ''}`}
+                        className={`py-4 border-b ${getThemeClasses(currentTheme, 'border')} hover:${getThemeClasses(currentTheme, 'hover')} transition-colors duration-200 cursor-pointer ${selectedNotification === notification.id ? 'border-l-4 border-l-gray-800' : ''}`}
                       >
                         <div className="flex items-start space-x-3">
                           <div className={`w-6 h-6 rounded-full flex items-center justify-center ${notification.type === 'success' ? 'bg-blue-500' : 'bg-gray-600'}`}>

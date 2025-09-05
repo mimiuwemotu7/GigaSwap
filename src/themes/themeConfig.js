@@ -52,9 +52,9 @@ export const themes = {
       textAccent: 'text-red-500',
       
       // Border colors
-      border: 'border-gray-800',
-      borderSecondary: 'border-gray-800',
-      borderTertiary: 'border-gray-800',
+      border: 'border-gray-300',
+      borderSecondary: 'border-gray-200',
+      borderTertiary: 'border-gray-100',
       
       // Interactive colors
       hover: 'hover:bg-gray-100',
