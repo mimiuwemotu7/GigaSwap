@@ -29,8 +29,9 @@ const ChatInput = () => {
 
   const handleSend = async () => {
     if (message.trim()) {
-      await sendMessage(message);
-      setMessage('');
+      const messageToSend = message;
+      setMessage(''); // Clear input immediately for better UX
+      await sendMessage(messageToSend);
     }
   };
 
