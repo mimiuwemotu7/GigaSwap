@@ -134,7 +134,7 @@ const Header = () => {
                                 </div>
                               </div>
                               <div className="flex flex-col items-end space-y-1 ml-2">
-                                <div className={`text-xs ${getThemeClasses(currentTheme, 'textTertiary')}`} style={{ fontSize: '7px' }}>
+                                <div className={`text-xs ${getThemeClasses(currentTheme, 'notificationTimestamp')}`} style={{ fontSize: '7px' }}>
                                   {notification.time}
                                 </div>
                                 {notification.action && (

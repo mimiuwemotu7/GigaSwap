@@ -36,7 +36,7 @@ const Sidebar = () => {
   const handleNewChat = (e) => {
     e.stopPropagation();
     createNewChat();
-    setShowChatHistory(false);
+    // Keep the chat dropdown open
   };
 
   const handleToggleHistory = (e) => {
@@ -102,8 +102,7 @@ const Sidebar = () => {
       id: 'chats',
       label: 'Chats',
       icon: MessageCircle,
-      hasDropdown: true,
-      hasAddButton: true
+      hasDropdown: true
     },
     {
       id: 'tokens',
@@ -114,10 +113,10 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className={`w-64 h-full flex flex-col ${getThemeClasses(currentTheme, 'sidebar')}`}>
+    <aside className={`${getThemeClasses(currentTheme, 'sidebarContainer')} ${getThemeClasses(currentTheme, 'sidebar')}`}>
       {/* Main Navigation */}
-      <div className="flex-1 p-4">
-        <nav className="space-y-2">
+      <div className={getThemeClasses(currentTheme, 'sidebarContent')}>
+        <nav className={getThemeClasses(currentTheme, 'sidebarNav')}>
           {sidebarItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeItem === item.id;
@@ -125,31 +124,29 @@ const Sidebar = () => {
             return (
               <div key={item.id}>
                 <div
-                  className={isActive ? getThemeClasses(currentTheme, 'sidebarItemActive') : getThemeClasses(currentTheme, 'sidebarItem')}
-                  onClick={() => setActiveItem(item.id)}
+                  className={isActive ? getThemeClasses(currentTheme, 'sidebarItemActive') : `${getThemeClasses(currentTheme, 'sidebarItem').replace(getThemeClasses(currentTheme, 'hover'), '')} ${(item.id === 'tokens' || item.id === 'chats') ? getThemeClasses(currentTheme, 'tokensButtonHover') : getThemeClasses(currentTheme, 'hover')}`}
+                  onClick={() => {
+                    setActiveItem(item.id);
+                    if (item.hasDropdown) {
+                      if (item.id === 'chats') {
+                        setShowChatHistory(!showChatHistory);
+                      } else if (item.id === 'tokens') {
+                        setShowTokensDropdown(!showTokensDropdown);
+                      }
+                    }
+                  }}
                 >
-                  <Icon className={`w-5 h-5 ${isActive ? getThemeClasses(currentTheme, 'sidebarIconActive') : getThemeClasses(currentTheme, 'sidebarIcon')}`} />
-                  <span className={`flex-1 ${isActive ? getThemeClasses(currentTheme, 'sidebarItemTextActive') : getThemeClasses(currentTheme, 'sidebarItemText')}`}>
+                  <Icon className={`${getThemeClasses(currentTheme, 'sidebarIconSize')} ${isActive ? getThemeClasses(currentTheme, 'sidebarIconActive') : getThemeClasses(currentTheme, 'sidebarIcon')}`} />
+                  <span className={`${getThemeClasses(currentTheme, 'sidebarTextContainer')} ${isActive ? getThemeClasses(currentTheme, 'sidebarItemTextActive') : getThemeClasses(currentTheme, 'sidebarItemText')}`}>
                     {item.label}
                   </span>
-                  {item.hasAddButton && (
-                    <button
-                      onClick={handleNewChat}
-                      className="p-1 hover:bg-gray-600 rounded transition-colors duration-200"
-                    >
-                      <Plus className={`w-4 h-4 ${getThemeClasses(currentTheme, 'sidebarIconActive')}`} />
-                    </button>
-                  )}
                   {item.hasDropdown && (
-                    <button
-                      onClick={item.id === 'chats' ? handleToggleHistory : handleToggleTokens}
-                      className="p-1 hover:bg-gray-600 rounded transition-colors duration-200"
-                    >
-                      <ChevronDown className={`w-4 h-4 ${getThemeClasses(currentTheme, 'sidebarIcon')} ${
+                    <div className={getThemeClasses(currentTheme, 'sidebarChevronContainer')}>
+                      <ChevronDown className={`${getThemeClasses(currentTheme, 'sidebarChevronSize')} ${isActive ? getThemeClasses(currentTheme, 'sidebarIconActive') : getThemeClasses(currentTheme, 'sidebarIcon')} ${
                         (item.id === 'chats' && showChatHistory) || (item.id === 'tokens' && showTokensDropdown) 
                           ? 'rotate-180' : ''
-                      } transition-transform duration-200`} />
-                    </button>
+                      } ${getThemeClasses(currentTheme, 'sidebarChevronTransition')}`} />
+                    </div>
                   )}
                 </div>
                 
@@ -157,14 +154,25 @@ const Sidebar = () => {
                 
                 {/* Chat History - appears directly under the Chats button */}
                 {item.id === 'chats' && (
-                  <div className={`ml-4 mt-2 overflow-hidden transition-all duration-300 ease-in-out ${
+                  <div className={`ml-4 mt-2 overflow-hidden transition-all duration-300 ease-in-out bg-transparent ${
                     showChatHistory ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                   }`}>
-                  <div className="space-y-1">
+                  <div className={`${getThemeClasses(currentTheme, 'listContainer')} ${getThemeClasses(currentTheme, 'chatHistoryDropdown')}`}>
+                      {/* New Chat Button */}
+                      <button
+                        onClick={handleNewChat}
+                        className={`${getThemeClasses(currentTheme, 'newChatButton')} ${getThemeClasses(currentTheme, 'hover')} hover:${getThemeClasses(currentTheme, 'tertiary')} border border-dashed ${getThemeClasses(currentTheme, 'border')} hover:border-solid hover:shadow-sm`}
+                      >
+                        <Plus className={`${getThemeClasses(currentTheme, 'newChatIcon')} ${getThemeClasses(currentTheme, 'sidebarIcon')}`} />
+                        <span className={`${getThemeClasses(currentTheme, 'newChatText')} ${getThemeClasses(currentTheme, 'textPrimary')}`}>
+                          New Chat
+                        </span>
+                      </button>
+                      
                       {chatHistory.map((chat, index) => (
                         <div
                           key={chat.id}
-                          className={`p-2 rounded-lg cursor-pointer transition-colors duration-200 focus:outline-none ${
+                          className={`${getThemeClasses(currentTheme, 'chatItemContainer')} ${
                             currentChatId === chat.id 
                               ? `${getThemeClasses(currentTheme, 'tertiary')} border-gray-800 border shadow-lg` 
                               : `${getThemeClasses(currentTheme, 'hover')} hover:${getThemeClasses(currentTheme, 'tertiary')}`
@@ -176,13 +184,13 @@ const Sidebar = () => {
                           onClick={() => setCurrentChatId(chat.id)}
                           tabIndex={-1}
                         >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1 min-w-0 text-left">
-                              <div className={`text-xs font-medium text-left truncate ${getThemeClasses(currentTheme, 'textPrimary')}`}>
+                          <div className={getThemeClasses(currentTheme, 'chatItemLayout')}>
+                            <div className={getThemeClasses(currentTheme, 'chatTextContainer')}>
+                              <div className={`${getThemeClasses(currentTheme, 'chatItemText')} ${getThemeClasses(currentTheme, 'textPrimary')}`}>
                                 {getChatPreview(chat.messages)}
                               </div>
-                              <div className={`text-xs mt-1 flex items-center space-x-1 text-left ${getThemeClasses(currentTheme, 'textSecondary')}`}>
-                                <Clock className="w-3 h-3" />
+                              <div className={`${getThemeClasses(currentTheme, 'chatItemTime')} ${getThemeClasses(currentTheme, 'textSecondary')}`}>
+                                <Clock className={getThemeClasses(currentTheme, 'chatItemClock')} />
                                 <span>{formatDate(chat.lastUpdated)}</span>
                               </div>
                             </div>
@@ -192,9 +200,9 @@ const Sidebar = () => {
                                 e.stopPropagation();
                                 deleteChat(chat.id);
                               }}
-                              className={`p-1 rounded hover:bg-red-500 hover:text-white transition-all duration-200 ml-2`}
+                              className={`${getThemeClasses(currentTheme, 'chatDeleteButton')} ${getThemeClasses(currentTheme, 'textPrimary')}`}
                             >
-                              <Trash2 className="w-3 h-3" />
+                              <Trash2 className={getThemeClasses(currentTheme, 'chatDeleteIcon')} />
                             </button>
                           </div>
                         </div>
@@ -202,9 +210,9 @@ const Sidebar = () => {
                     </div>
                     
                     {chatHistory.length === 0 && (
-                      <div className={`text-center py-4 ${getThemeClasses(currentTheme, 'textSecondary')}`}>
-                        <MessageSquare className="w-6 h-6 mx-auto mb-2 opacity-50" />
-                        <div className="text-xs">No chat history yet</div>
+                      <div className={`${getThemeClasses(currentTheme, 'chatEmptyContainer')} ${getThemeClasses(currentTheme, 'textSecondary')}`}>
+                        <MessageSquare className={getThemeClasses(currentTheme, 'chatEmptyIcon')} />
+                        <div className={getThemeClasses(currentTheme, 'chatEmptyText')}>No chat history yet</div>
                       </div>
                     )}
                   </div>
@@ -212,39 +220,39 @@ const Sidebar = () => {
                 
                 {/* Tokens List - appears directly under the Tokens button */}
                 {item.id === 'tokens' && (
-                  <div className={`ml-4 mt-2 overflow-hidden transition-all duration-300 ease-in-out ${
+                  <div className={`ml-4 mt-2 overflow-hidden transition-all duration-300 ease-in-out bg-transparent ${
                     showTokensDropdown ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                   }`}>
-                    <div className="space-y-1">
+                    <div className={`${getThemeClasses(currentTheme, 'listContainer')} ${getThemeClasses(currentTheme, 'tokensDropdown')}`}>
                         {tokens.map((token, index) => (
                           <div
                             key={token.id}
-                            className={`p-2 rounded-lg cursor-pointer transition-all duration-200 ${getThemeClasses(currentTheme, 'hover')} hover:${getThemeClasses(currentTheme, 'tertiary')}`}
+                            className={`${getThemeClasses(currentTheme, 'tokenItemContainer')} ${getThemeClasses(currentTheme, 'hover')} hover:${getThemeClasses(currentTheme, 'tertiary')}`}
                             style={{
                               animationDelay: showTokensDropdown ? `${index * 50}ms` : '0ms',
                               animation: showTokensDropdown ? 'slideInFromTop 0.3s ease-out forwards' : 'none'
                             }}
                           >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center space-x-2">
-                                <div className={`w-6 h-6 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-xs font-bold ${getThemeClasses(currentTheme, 'textPrimary')}`}>
+                            <div className={getThemeClasses(currentTheme, 'tokenItemLayout')}>
+                              <div className={getThemeClasses(currentTheme, 'tokenIconLayout')}>
+                                <div className={`${getThemeClasses(currentTheme, 'tokenIconContainer')} ${getThemeClasses(currentTheme, 'textPrimary')}`}>
                                   {token.icon}
                                 </div>
-                                <div className="flex-1 min-w-0 text-left">
-                                  <div className={`text-xs font-medium text-left truncate ${getThemeClasses(currentTheme, 'textPrimary')}`}>
+                                <div className={getThemeClasses(currentTheme, 'tokenTextContainer')}>
+                                  <div className={`${getThemeClasses(currentTheme, 'tokenSymbol')} ${getThemeClasses(currentTheme, 'textPrimary')}`}>
                                     {token.symbol}
                                   </div>
-                                  <div className={`text-xs text-left truncate ${getThemeClasses(currentTheme, 'textSecondary')}`}>
+                                  <div className={`${getThemeClasses(currentTheme, 'tokenName')} ${getThemeClasses(currentTheme, 'textSecondary')}`}>
                                     {token.name}
                                   </div>
                                 </div>
                               </div>
                               
-                              <div className="text-right">
-                                <div className={`text-xs font-medium ${getThemeClasses(currentTheme, 'textPrimary')}`}>
+                              <div className={getThemeClasses(currentTheme, 'tokenPriceContainer')}>
+                                <div className={`${getThemeClasses(currentTheme, 'tokenPrice')} ${getThemeClasses(currentTheme, 'textPrimary')}`}>
                                   {token.price}
                                 </div>
-                                <div className={`text-xs ${token.isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                                <div className={`${getThemeClasses(currentTheme, 'tokenChange')} ${token.isPositive ? getThemeClasses(currentTheme, 'tokenChangePositive') : getThemeClasses(currentTheme, 'tokenChangeNegative')}`}>
                                   {token.change24h}
                                 </div>
                               </div>
@@ -263,15 +271,15 @@ const Sidebar = () => {
       </div>
 
       {/* Bottom Section - Social Links */}
-      <div className={`p-3 border-t border-gray-800`}>
-        <div className="space-y-1">
-          <button className={`flex items-center space-x-2 px-2 py-1 ${getThemeClasses(currentTheme, 'textSecondary')} hover:${getThemeClasses(currentTheme, 'textPrimary')} transition-colors duration-200`}>
-            <Twitter className={`w-3 h-3 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
-            <span className="text-xs">Follow Twitter</span>
+      <div className={getThemeClasses(currentTheme, 'bottomSection')}>
+        <div className={getThemeClasses(currentTheme, 'socialContainer')}>
+          <button className={`${getThemeClasses(currentTheme, 'socialButton')} ${getThemeClasses(currentTheme, 'textSecondary')}`}>
+            <Twitter className={getThemeClasses(currentTheme, 'socialIcon')} />
+            <span className={getThemeClasses(currentTheme, 'socialText')}>Follow Twitter</span>
           </button>
-          <button className={`flex items-center space-x-2 px-2 py-1 ${getThemeClasses(currentTheme, 'textSecondary')} hover:${getThemeClasses(currentTheme, 'textPrimary')} transition-colors duration-200`}>
-            <MessageSquare className={`w-3 h-3 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
-            <span className="text-xs">Join Discord</span>
+          <button className={`${getThemeClasses(currentTheme, 'socialButton')} ${getThemeClasses(currentTheme, 'textSecondary')}`}>
+            <MessageSquare className={getThemeClasses(currentTheme, 'socialIcon')} />
+            <span className={getThemeClasses(currentTheme, 'socialText')}>Join Discord</span>
           </button>
         </div>
       </div>
