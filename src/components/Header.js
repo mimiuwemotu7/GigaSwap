@@ -114,7 +114,14 @@ const Header = () => {
     
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
     
+    // Open menu with right swipe (swipe from left edge to right)
+    if (isRightSwipe && !showMobileMenu) {
+      setShowMobileMenu(true);
+    }
+    
+    // Close menu with left swipe (swipe from right to left)
     if (isLeftSwipe && showMobileMenu) {
       setShowMobileMenu(false);
     }
@@ -126,7 +133,12 @@ const Header = () => {
 
 
   return (
-    <header className={`w-full py-4 px-6 ${getThemeClasses(currentTheme, 'headerContainer')}`}>
+    <header 
+      className={`w-full py-4 px-6 ${getThemeClasses(currentTheme, 'headerContainer')}`}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
       <div className="w-full flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <img src="/icon2.png" alt="GigaSwap" className="w-8 h-8" />
@@ -308,7 +320,7 @@ const Header = () => {
                             <div className={`w-6 h-6 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-xs font-bold ${getThemeClasses(currentTheme, 'textPrimary')}`}>
                               {token.icon}
                             </div>
-                            <div>
+                            <div className="text-left">
                               <div className={`text-sm font-medium ${getThemeClasses(currentTheme, 'textPrimary')}`}>
                                 {token.symbol}
                               </div>

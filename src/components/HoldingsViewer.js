@@ -124,11 +124,11 @@ const HoldingsViewer = () => {
                 <div className={`w-10 h-10 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center text-sm font-bold ${getThemeClasses(currentTheme, 'textPrimary')}`}>
                   {holding.icon}
                 </div>
-                <div>
-                  <div className={`font-semibold text-left text-sm md:text-base ${getThemeClasses(currentTheme, 'textPrimary')}`}>
+                <div className="text-left">
+                  <div className={`font-semibold text-sm md:text-base ${getThemeClasses(currentTheme, 'textPrimary')}`}>
                     {holding.symbol}
                   </div>
-                  <div className={`text-xs text-left ${getThemeClasses(currentTheme, 'textSecondary')}`}>
+                  <div className={`text-xs ${getThemeClasses(currentTheme, 'textSecondary')}`}>
                     {holding.name}
                   </div>
                 </div>
