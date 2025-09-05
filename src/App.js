@@ -3,7 +3,6 @@ import './App.css';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import ChatArea from './components/ChatArea';
-import SwapComponent from './components/SwapComponent';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ChatProvider, useChat } from './contexts/ChatContext';
 

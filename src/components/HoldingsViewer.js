@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TrendingUp, TrendingDown, Eye, EyeOff, ChevronDown, ArrowUpDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, Eye, EyeOff } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useChat } from '../contexts/ChatContext';
 import { getThemeClasses } from '../themes/themeConfig';
@@ -8,7 +8,6 @@ const HoldingsViewer = () => {
   const { currentTheme } = useTheme();
   const { sendMessage } = useChat();
   const [showBalances, setShowBalances] = useState(true);
-  const [sortBy, setSortBy] = useState('value');
 
   // Mock data - in a real app, this would come from an API
   const holdings = [
@@ -86,7 +85,7 @@ const HoldingsViewer = () => {
   };
 
   return (
-    <div className={`max-w-sm mx-auto rounded-xl p-3 shadow-lg ${getThemeClasses(currentTheme, 'container')} ${currentTheme === 'dark' ? 'border border-gray-400' : ''}`}>
+    <div className={`max-w-sm mx-auto rounded-xl p-3 shadow-lg ${getThemeClasses(currentTheme, 'container')} border border-gray-800`}>
       
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
@@ -155,7 +154,7 @@ const HoldingsViewer = () => {
                 
                 <button 
                   onClick={() => handleSwap(holding)}
-                  className={`px-3 py-1 rounded-lg border ${getThemeClasses(currentTheme, 'border')} text-sm font-medium ${getThemeClasses(currentTheme, 'textPrimary')} hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-200`}
+                  className={`px-3 py-1 rounded-lg border ${getThemeClasses(currentTheme, 'border')} text-sm font-medium ${getThemeClasses(currentTheme, 'textPrimary')} hover:bg-red-500 hover:text-white hover:border-gray-800 transition-all duration-200`}
                 >
                   Swap
                 </button>

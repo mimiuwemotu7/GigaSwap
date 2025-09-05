@@ -15,9 +15,9 @@ export const themes = {
       textAccent: 'text-red-400',
       
       // Border colors
-      border: 'border-[#404040]',
-      borderSecondary: 'border-[#404040]',
-      borderTertiary: 'border-[#404040]',
+      border: 'border-gray-800',
+      borderSecondary: 'border-gray-800',
+      borderTertiary: 'border-gray-800',
       
       // Interactive colors
       hover: 'hover:bg-[#262626]',
@@ -52,9 +52,9 @@ export const themes = {
       textAccent: 'text-red-500',
       
       // Border colors
-      border: 'border-gray-300',
-      borderSecondary: 'border-gray-200',
-      borderTertiary: 'border-gray-100',
+      border: 'border-gray-800',
+      borderSecondary: 'border-gray-800',
+      borderTertiary: 'border-gray-800',
       
       // Interactive colors
       hover: 'hover:bg-gray-100',
@@ -86,7 +86,7 @@ export const getThemeClasses = (theme, component, variant = 'default') => {
     textSecondary: `${themeColors.textSecondary}`,
     sidebar: `${themeColors.secondary} ${themeColors.border} border-r shadow-lg`,
     sidebarItem: `flex items-center space-x-3 px-4 py-3 cursor-pointer ${themeColors.hover} transition-all duration-200 rounded-lg mx-2 my-1`,
-    sidebarItemActive: `flex items-center space-x-3 px-4 py-3 cursor-pointer ${themeColors.tertiary} ${themeColors.borderSecondary} border-r-4 border-red-400 rounded-lg mx-2 my-1 shadow-md`,
+    sidebarItemActive: `flex items-center space-x-3 px-4 py-3 cursor-pointer ${themeColors.tertiary} ${themeColors.borderSecondary} border-r-4 border-gray-800 rounded-lg mx-2 my-1 shadow-md`,
     sidebarItemText: `${themeColors.textPrimary} font-medium`,
     sidebarItemTextActive: `${themeColors.textAccent} font-semibold`,
     sidebarIcon: `${themeColors.textSecondary}`,

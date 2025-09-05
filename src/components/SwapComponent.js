@@ -96,7 +96,7 @@ const CryptoSwapComponent = () => {
   };
 
   return (
-    <div className={`max-w-sm mx-auto rounded-xl p-3 shadow-lg ${getThemeClasses(currentTheme, 'container')} ${currentTheme === 'dark' ? 'border border-gray-400' : ''}`}>
+    <div className={`max-w-sm mx-auto rounded-xl p-3 shadow-lg ${getThemeClasses(currentTheme, 'container')} border border-gray-800`}>
 
 
       {/* From Section */}

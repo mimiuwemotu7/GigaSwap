@@ -1,6 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import SwapComponent from '../components/SwapComponent';
-import HoldingsViewer from '../components/HoldingsViewer';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 const ChatContext = createContext();
 
@@ -13,12 +11,83 @@ export const useChat = () => {
 };
 
 export const ChatProvider = ({ children }) => {
-  const [messages, setMessages] = useState([]);
+  const [currentChatId, setCurrentChatId] = useState(null);
+  const [chatHistory, setChatHistory] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [selectedModel, setSelectedModel] = useState('openai');
   const [selectedNetwork, setSelectedNetwork] = useState('solana');
 
+  const createNewChat = useCallback(() => {
+    const newChat = {
+      id: Date.now(),
+      messages: [],
+      createdAt: new Date().toISOString(),
+      lastUpdated: new Date().toISOString()
+    };
+    
+    setChatHistory(prev => [newChat, ...prev]);
+    setCurrentChatId(newChat.id);
+    return newChat;
+  }, []);
+
+  // Load chat history from localStorage on mount
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('gigaswap-chat-history');
+    if (savedHistory) {
+      const parsed = JSON.parse(savedHistory);
+      setChatHistory(parsed);
+      if (parsed.length > 0 && !currentChatId) {
+        setCurrentChatId(parsed[0].id);
+      }
+    } else {
+      // Create initial chat
+      const newChat = {
+        id: Date.now(),
+        messages: [],
+        createdAt: new Date().toISOString(),
+        lastUpdated: new Date().toISOString()
+      };
+      setChatHistory([newChat]);
+      setCurrentChatId(newChat.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Remove dependencies to prevent circular dependency
+
+  // Save chat history to localStorage whenever it changes
+  useEffect(() => {
+    if (chatHistory.length > 0) {
+      localStorage.setItem('gigaswap-chat-history', JSON.stringify(chatHistory));
+    }
+  }, [chatHistory]);
+
+  const deleteChat = useCallback((chatId) => {
+    setChatHistory(prev => {
+      const filtered = prev.filter(chat => chat.id !== chatId);
+      if (currentChatId === chatId && filtered.length > 0) {
+        setCurrentChatId(filtered[0].id);
+      } else if (filtered.length === 0) {
+        // Create a new chat directly instead of calling createNewChat
+        const newChat = {
+          id: Date.now(),
+          messages: [],
+          createdAt: new Date().toISOString(),
+          lastUpdated: new Date().toISOString()
+        };
+        setCurrentChatId(newChat.id);
+        return [newChat];
+      }
+      return filtered;
+    });
+  }, [currentChatId]);
+
+  const getCurrentMessages = useCallback(() => {
+    const currentChat = chatHistory.find(chat => chat.id === currentChatId);
+    return currentChat ? currentChat.messages : [];
+  }, [chatHistory, currentChatId]);
+
   const addMessage = useCallback((text, type = 'user', component = null) => {
+    if (!currentChatId) return;
+    
     const newMessage = {
       id: Date.now(),
       text,
@@ -27,9 +96,18 @@ export const ChatProvider = ({ children }) => {
       timestamp: new Date().toISOString()
     };
     
-    setMessages(prev => [...prev, newMessage]);
+    setChatHistory(prev => prev.map(chat => 
+      chat.id === currentChatId 
+        ? { 
+            ...chat, 
+            messages: [...chat.messages, newMessage],
+            lastUpdated: new Date().toISOString()
+          }
+        : chat
+    ));
+    
     return newMessage;
-  }, []);
+  }, [currentChatId]);
 
   const simulateBotResponse = useCallback(async (userMessage) => {
     setIsTyping(true);
@@ -46,12 +124,12 @@ export const ChatProvider = ({ children }) => {
       botResponse = `I can help you check current crypto prices and market data. For real-time prices, I'd recommend checking our price feeds or connecting to a price API. What specific token are you interested in?`;
     } else if (userMessage.toLowerCase().includes('swap') || userMessage.toLowerCase().includes('trade')) {
       botResponse = `Here you go chad`;
-      addMessage(botResponse, 'bot', <SwapComponent />);
+      addMessage(botResponse, 'bot', 'SwapComponent');
       setIsTyping(false);
       return;
     } else if (userMessage.toLowerCase().includes('holdings') || userMessage.toLowerCase().includes('portfolio')) {
       botResponse = `Here's your portfolio overview`;
-      addMessage(botResponse, 'bot', <HoldingsViewer />);
+      addMessage(botResponse, 'bot', 'HoldingsViewer');
       setIsTyping(false);
       return;
     } else if (userMessage.toLowerCase().includes('defi') || userMessage.toLowerCase().includes('yield')) {
@@ -82,20 +160,29 @@ export const ChatProvider = ({ children }) => {
     await simulateBotResponse(text);
   }, [addMessage, simulateBotResponse]);
 
-  const clearChat = useCallback(() => {
-    setMessages([]);
-  }, []);
-
   const value = {
-    messages,
+    currentChatId,
+    setCurrentChatId,
+    chatHistory,
+    messages: getCurrentMessages(),
     isTyping,
     selectedModel,
     selectedNetwork,
     setSelectedModel,
     setSelectedNetwork,
     sendMessage,
-    clearChat,
-    addMessage
+    clearChat: () => {
+      if (currentChatId) {
+        setChatHistory(prev => prev.map(chat => 
+          chat.id === currentChatId 
+            ? { ...chat, messages: [], lastUpdated: new Date().toISOString() }
+            : chat
+        ));
+      }
+    },
+    addMessage,
+    createNewChat,
+    deleteChat
   };
 
   return (

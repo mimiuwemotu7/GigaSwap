@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { getThemeClasses } from '../themes/themeConfig';
 import ChatInput from './ChatInput';
+import SwapComponent from './SwapComponent';
+import HoldingsViewer from './HoldingsViewer';
 
 const ChatArea = ({ messages = [], isTyping = false }) => {
   const { currentTheme } = useTheme();
@@ -20,6 +22,17 @@ const ChatArea = ({ messages = [], isTyping = false }) => {
       hour: '2-digit', 
       minute: '2-digit' 
     });
+  };
+
+  const renderComponent = (componentType) => {
+    switch (componentType) {
+      case 'SwapComponent':
+        return <SwapComponent />;
+      case 'HoldingsViewer':
+        return <HoldingsViewer />;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -90,7 +103,7 @@ const ChatArea = ({ messages = [], isTyping = false }) => {
                       </div>
                       {message.component && (
                         <div className="mt-3 w-full">
-                          {message.component}
+                          {renderComponent(message.component)}
                         </div>
                       )}
                       <div className={`${getThemeClasses(currentTheme, 'chatMessageTime')} mt-1`}>
