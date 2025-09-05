@@ -97,9 +97,9 @@ const Header = () => {
   const minSwipeDistance = 50;
 
   const onTouchStart = (e) => {
-    setTouchEnd(null);
     if (e.targetTouches && e.targetTouches[0]) {
       setTouchStart(e.targetTouches[0].clientX);
+      setTouchEnd(null);
     }
   };
 
@@ -118,6 +118,10 @@ const Header = () => {
     if (isLeftSwipe && showMobileMenu) {
       setShowMobileMenu(false);
     }
+    
+    // Reset touch values
+    setTouchStart(null);
+    setTouchEnd(null);
   };
 
 
@@ -182,6 +186,9 @@ const Header = () => {
             showMobileMenu ? 'opacity-100' : 'opacity-0'
           }`}
           onClick={() => setShowMobileMenu(false)}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
         />
         
         {/* Side Drawer */}
@@ -189,9 +196,6 @@ const Header = () => {
           className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] z-50 slide-drawer-right ${
             showMobileMenu ? 'open' : ''
           }`}
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
         >
             <div className={`h-full ${getThemeClasses(currentTheme, 'headerContainer')} border-l ${getThemeClasses(currentTheme, 'border')} shadow-xl`}>
               {/* Drawer Header */}

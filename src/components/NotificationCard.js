@@ -80,7 +80,7 @@ const NotificationCard = ({
     <div className="absolute top-full right-0 mt-2 w-80 max-w-[90vw] z-50" ref={notificationRef}>
       <div className={`${getThemeClasses(currentTheme, 'notificationCard')} rounded-lg`}>
         {/* Notification Header */}
-        <div className="flex items-center justify-between p-3 border-b border-gray-700">
+        <div className={`flex items-center justify-between p-3 border-b ${getThemeClasses(currentTheme, 'notificationHeaderBorder')}`}>
           <h3 className={`text-sm font-semibold ${getThemeClasses(currentTheme, 'textPrimary')}`}>
             Notifications
           </h3>
@@ -101,7 +101,7 @@ const NotificationCard = ({
             return (
               <div
                 key={notification.id}
-                className={`p-3 border-b border-gray-700 last:border-b-0 cursor-pointer transition-colors duration-200`}
+                className={`p-3 border-b ${getThemeClasses(currentTheme, 'notificationHeaderBorder')} last:border-b-0 cursor-pointer transition-colors duration-200`}
                 onClick={() => setSelectedNotification(notification.id)}
               >
                 <div className="flex items-start space-x-3">
@@ -129,7 +129,7 @@ const NotificationCard = ({
         </div>
         
         {/* Notification Footer */}
-        <div className="p-3 border-t border-gray-700">
+        <div className={`p-3 border-t ${getThemeClasses(currentTheme, 'notificationHeaderBorder')}`}>
           <button className={`w-full text-xs transition-colors duration-200 px-2 py-1 rounded ${getThemeClasses(currentTheme, 'textPrimary')}`}>
             Clear All
           </button>

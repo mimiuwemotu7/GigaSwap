@@ -19,6 +19,8 @@ export const themes = {
       borderSecondary: 'border-gray-700',
       borderTertiary: 'border-gray-700',
       borderColor: 'border-gray-700',
+      notificationHeaderBorder: 'border-gray-700',
+      headerBorder: 'border-gray-700',
       
       // Interactive colors
       hover: 'hover:bg-gray-700',
@@ -57,6 +59,8 @@ export const themes = {
       borderSecondary: 'border-gray-700',
       borderTertiary: 'border-gray-700',
       borderColor: 'border-gray-700',
+      notificationHeaderBorder: 'border-black',
+      headerBorder: 'border-black',
       
       // Interactive colors
       hover: 'hover:bg-gray-100',
@@ -82,7 +86,7 @@ export const getThemeClasses = (theme, component, variant = 'default') => {
   const componentStyles = {
     container: `${themeColors.primary} rounded-2xl shadow-2xl ${themeColors.border}`,
     header: `${themeColors.textPrimary} font-bold`,
-    headerContainer: `${themeColors.primary} ${themeColors.border}`,
+    headerContainer: `${themeColors.primary} ${themeColors.border} border-b ${themeColors.headerBorder}`,
     headerTitle: `${themeColors.textPrimary} font-bold`,
     textPrimary: `${themeColors.textPrimary}`,
     textSecondary: `${themeColors.textSecondary}`,
