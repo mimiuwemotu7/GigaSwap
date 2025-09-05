@@ -98,11 +98,15 @@ const Header = () => {
 
   const onTouchStart = (e) => {
     setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
+    if (e.targetTouches && e.targetTouches[0]) {
+      setTouchStart(e.targetTouches[0].clientX);
+    }
   };
 
   const onTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+    if (e.targetTouches && e.targetTouches[0]) {
+      setTouchEnd(e.targetTouches[0].clientX);
+    }
   };
 
   const onTouchEnd = () => {
