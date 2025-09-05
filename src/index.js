@@ -88,8 +88,20 @@ window.addEventListener('unhandledrejection', (event) => {
 });
 
 // Mobile-specific error handling
-if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+if (isMobile) {
   console.log('Mobile device detected:', navigator.userAgent);
+  
+  // Check for required APIs
+  const requiredAPIs = {
+    localStorage: typeof Storage !== 'undefined',
+    JSON: typeof JSON !== 'undefined',
+    Date: typeof Date !== 'undefined',
+    console: typeof console !== 'undefined'
+  };
+  
+  console.log('API availability check:', requiredAPIs);
   
   // Add mobile-specific error handling
   window.addEventListener('touchstart', (e) => {
@@ -98,6 +110,14 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
       e.preventDefault();
     }
   }, { passive: false });
+  
+  // Add viewport meta tag if missing
+  if (!document.querySelector('meta[name="viewport"]')) {
+    const viewport = document.createElement('meta');
+    viewport.name = 'viewport';
+    viewport.content = 'width=device-width, initial-scale=1';
+    document.head.appendChild(viewport);
+  }
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

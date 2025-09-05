@@ -12,18 +12,23 @@ const Sidebar = () => {
   const [showTokensDropdown, setShowTokensDropdown] = useState(false);
 
   const formatDate = (timestamp) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInHours = (now - date) / (1000 * 60 * 60);
-    
-    if (diffInHours < 1) {
-      return 'Just now';
-    } else if (diffInHours < 24) {
-      return `${Math.floor(diffInHours)}h ago`;
-    } else if (diffInHours < 168) { // 7 days
-      return `${Math.floor(diffInHours / 24)}d ago`;
-    } else {
-      return date.toLocaleDateString();
+    try {
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diffInHours = (now - date) / (1000 * 60 * 60);
+      
+      if (diffInHours < 1) {
+        return 'Just now';
+      } else if (diffInHours < 24) {
+        return `${Math.floor(diffInHours)}h ago`;
+      } else if (diffInHours < 168) { // 7 days
+        return `${Math.floor(diffInHours / 24)}d ago`;
+      } else {
+        return date.toLocaleDateString();
+      }
+    } catch (error) {
+      console.warn('Failed to format date:', error);
+      return 'Unknown';
     }
   };
 

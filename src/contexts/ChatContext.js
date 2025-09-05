@@ -32,15 +32,28 @@ export const ChatProvider = ({ children }) => {
 
   // Load chat history from localStorage on mount
   useEffect(() => {
-    const savedHistory = localStorage.getItem('gigaswap-chat-history');
-    if (savedHistory) {
-      const parsed = JSON.parse(savedHistory);
-      setChatHistory(parsed);
-      if (parsed.length > 0 && !currentChatId) {
-        setCurrentChatId(parsed[0].id);
+    try {
+      const savedHistory = localStorage.getItem('gigaswap-chat-history');
+      if (savedHistory) {
+        const parsed = JSON.parse(savedHistory);
+        setChatHistory(parsed);
+        if (parsed.length > 0 && !currentChatId) {
+          setCurrentChatId(parsed[0].id);
+        }
+      } else {
+        // Create initial chat
+        const newChat = {
+          id: Date.now(),
+          messages: [],
+          createdAt: new Date().toISOString(),
+          lastUpdated: new Date().toISOString()
+        };
+        setChatHistory([newChat]);
+        setCurrentChatId(newChat.id);
       }
-    } else {
-      // Create initial chat
+    } catch (error) {
+      console.warn('Failed to load chat history from localStorage:', error);
+      // Create initial chat as fallback
       const newChat = {
         id: Date.now(),
         messages: [],
@@ -55,8 +68,12 @@ export const ChatProvider = ({ children }) => {
 
   // Save chat history to localStorage whenever it changes
   useEffect(() => {
-    if (chatHistory.length > 0) {
-      localStorage.setItem('gigaswap-chat-history', JSON.stringify(chatHistory));
+    try {
+      if (chatHistory.length > 0) {
+        localStorage.setItem('gigaswap-chat-history', JSON.stringify(chatHistory));
+      }
+    } catch (error) {
+      console.warn('Failed to save chat history to localStorage:', error);
     }
   }, [chatHistory]);
 

@@ -15,15 +15,23 @@ export const ThemeProvider = ({ children }) => {
 
   // Load theme from localStorage on mount
   useEffect(() => {
-    const savedTheme = localStorage.getItem('swap-theme');
-    if (savedTheme && (savedTheme === 'dark' || savedTheme === 'light')) {
-      setCurrentTheme(savedTheme);
+    try {
+      const savedTheme = localStorage.getItem('swap-theme');
+      if (savedTheme && (savedTheme === 'dark' || savedTheme === 'light')) {
+        setCurrentTheme(savedTheme);
+      }
+    } catch (error) {
+      console.warn('Failed to load theme from localStorage:', error);
     }
   }, []);
 
   // Save theme to localStorage when it changes
   useEffect(() => {
-    localStorage.setItem('swap-theme', currentTheme);
+    try {
+      localStorage.setItem('swap-theme', currentTheme);
+    } catch (error) {
+      console.warn('Failed to save theme to localStorage:', error);
+    }
   }, [currentTheme]);
 
   // Apply theme class to body element

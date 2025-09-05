@@ -10,7 +10,21 @@ const ChatArea = ({ messages = [], isTyping = false }) => {
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    try {
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    } catch (error) {
+      console.warn('Failed to scroll to bottom:', error);
+      // Fallback to instant scroll
+      try {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView();
+        }
+      } catch (fallbackError) {
+        console.warn('Fallback scroll also failed:', fallbackError);
+      }
+    }
   };
 
   useEffect(() => {
@@ -18,10 +32,22 @@ const ChatArea = ({ messages = [], isTyping = false }) => {
   }, [messages, isTyping]);
 
   const formatTime = (timestamp) => {
-    return new Date(timestamp).toLocaleTimeString([], { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
+    try {
+      return new Date(timestamp).toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+    } catch (error) {
+      console.warn('Failed to format time:', error);
+      // Fallback to simple time format
+      try {
+        const date = new Date(timestamp);
+        return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+      } catch (fallbackError) {
+        console.warn('Fallback time format also failed:', fallbackError);
+        return '--:--';
+      }
+    }
   };
 
   const renderComponent = (componentType) => {
