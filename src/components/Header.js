@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Bell, Menu, Wallet, MessageCircle, Coins, ChevronDown, Plus, Trash2, Clock, X } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useChat } from '../contexts/ChatContext';
@@ -16,6 +16,57 @@ const Header = () => {
   const [touchEnd, setTouchEnd] = useState(null);
   const [showChatHistory, setShowChatHistory] = useState(false);
   const [showTokensDropdown, setShowTokensDropdown] = useState(false);
+
+  // Global touch events for swipe functionality
+  useEffect(() => {
+    const handleTouchStart = (e) => {
+      if (e.targetTouches && e.targetTouches[0]) {
+        const startX = e.targetTouches[0].clientX;
+        setTouchStart(startX);
+        setTouchEnd(null);
+      }
+    };
+
+    const handleTouchMove = (e) => {
+      if (e.targetTouches && e.targetTouches[0]) {
+        setTouchEnd(e.targetTouches[0].clientX);
+      }
+    };
+
+    const handleTouchEnd = () => {
+      if (!touchStart || !touchEnd) return;
+      
+      const distance = touchStart - touchEnd;
+      const isLeftSwipe = distance > minSwipeDistance;
+      const isRightSwipe = distance < -minSwipeDistance;
+      
+      // Open menu with right swipe (anywhere on screen)
+      if (isRightSwipe && !showMobileMenu) {
+        setShowMobileMenu(true);
+      }
+      
+      // Close menu with left swipe (anywhere on screen)
+      if (isLeftSwipe && showMobileMenu) {
+        setShowMobileMenu(false);
+      }
+      
+      // Reset touch values
+      setTouchStart(null);
+      setTouchEnd(null);
+    };
+
+    // Add touch events to document
+    document.addEventListener('touchstart', handleTouchStart, { passive: true });
+    document.addEventListener('touchmove', handleTouchMove, { passive: true });
+    document.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    // Cleanup
+    return () => {
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [touchStart, touchEnd, showMobileMenu, minSwipeDistance]);
 
   // Helper functions from Sidebar
   const formatDate = (timestamp) => {
@@ -93,51 +144,13 @@ const Header = () => {
     }
   ];
 
-  // Swipe detection functions
+  // Swipe detection constants
   const minSwipeDistance = 50;
-
-  const onTouchStart = (e) => {
-    if (e.targetTouches && e.targetTouches[0]) {
-      setTouchStart(e.targetTouches[0].clientX);
-      setTouchEnd(null);
-    }
-  };
-
-  const onTouchMove = (e) => {
-    if (e.targetTouches && e.targetTouches[0]) {
-      setTouchEnd(e.targetTouches[0].clientX);
-    }
-  };
-
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-    
-    // Open menu with right swipe (swipe from left edge to right)
-    if (isRightSwipe && !showMobileMenu) {
-      setShowMobileMenu(true);
-    }
-    
-    // Close menu with left swipe (swipe from right to left)
-    if (isLeftSwipe && showMobileMenu) {
-      setShowMobileMenu(false);
-    }
-    
-    // Reset touch values
-    setTouchStart(null);
-    setTouchEnd(null);
-  };
 
 
   return (
     <header 
       className={`w-full py-4 px-6 ${getThemeClasses(currentTheme, 'headerContainer')}`}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
     >
       <div className="w-full flex items-center justify-between">
         <div className="flex items-center space-x-3">
@@ -198,9 +211,6 @@ const Header = () => {
             showMobileMenu ? 'opacity-100' : 'opacity-0'
           }`}
           onClick={() => setShowMobileMenu(false)}
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
         />
         
         {/* Side Drawer */}
