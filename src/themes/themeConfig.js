@@ -3,36 +3,36 @@ export const themes = {
     name: 'Dark',
     colors: {
       // Background colors
-      primary: 'bg-[#171717]',
-      secondary: 'bg-[#1f1f1f]',
-      tertiary: 'bg-[#262626]',
-      card: 'bg-[#1f1f1f]',
+      primary: 'bg-[#161716]',
+      secondary: 'bg-[#1e1f1e]',
+      tertiary: 'bg-[#1e1f1e]',
+      card: 'bg-[#272627]',
       
       // Text colors
       textPrimary: 'text-white',
-      textSecondary: 'text-[#a3a3a3]',
-      textTertiary: 'text-[#737373]',
+      textSecondary: 'text-gray-300',
+      textTertiary: 'text-gray-400',
       textAccent: 'text-red-400',
       
       // Border colors
-      border: 'border-gray-800',
-      borderSecondary: 'border-gray-800',
-      borderTertiary: 'border-gray-800',
+      border: 'border-b border-white',
+      borderSecondary: 'border-white',
+      borderTertiary: 'border-white',
       
       // Interactive colors
-      hover: 'hover:bg-[#262626]',
+      hover: 'hover:bg-gray-700',
       buttonPrimary: 'bg-gradient-to-r from-red-500 to-red-600',
       buttonPrimaryHover: 'hover:from-red-400 hover:to-red-500',
-      buttonSecondary: 'bg-gradient-to-br from-[#262626] to-[#1f1f1f]',
-      buttonSecondaryHover: 'hover:from-[#404040] hover:to-[#262626]',
-      buttonDisabled: 'bg-[#1f1f1f]',
+      buttonSecondary: 'bg-gradient-to-br from-red-400 to-red-500',
+      buttonSecondaryHover: 'hover:from-red-300 hover:to-red-400',
+      buttonDisabled: 'bg-gray-800',
       
       // Token selector colors
-      tokenIcon: 'bg-gradient-to-br from-[#404040] to-[#262626]',
+      tokenIcon: 'bg-gradient-to-br from-gray-600 to-white',
       
       // Input colors
-      inputBg: 'bg-[#1f1f1f]',
-      inputPlaceholder: 'placeholder-[#737373]',
+      inputBg: 'bg-[#1e1f1e]',
+      inputPlaceholder: 'placeholder-gray-400',
     }
   },
   
@@ -43,7 +43,7 @@ export const themes = {
       primary: 'bg-white',
       secondary: 'bg-gray-50',
       tertiary: 'bg-gray-100',
-      card: 'bg-gray-200',
+      card: 'bg-white',
       
       // Text colors
       textPrimary: 'text-gray-900',
@@ -52,9 +52,9 @@ export const themes = {
       textAccent: 'text-red-500',
       
       // Border colors
-      border: 'border-gray-300',
-      borderSecondary: 'border-gray-200',
-      borderTertiary: 'border-gray-100',
+      border: 'border-b border-black',
+      borderSecondary: 'border-black',
+      borderTertiary: 'border-black',
       
       // Interactive colors
       hover: 'hover:bg-gray-100',
@@ -80,13 +80,13 @@ export const getThemeClasses = (theme, component, variant = 'default') => {
   const componentStyles = {
     container: `${themeColors.primary} rounded-2xl shadow-2xl ${themeColors.border}`,
     header: `${themeColors.textPrimary} font-bold`,
-    headerContainer: `${themeColors.primary} ${themeColors.border} border-b`,
+    headerContainer: `${themeColors.primary} ${themeColors.border}`,
     headerTitle: `${themeColors.textPrimary} font-bold`,
     textPrimary: `${themeColors.textPrimary}`,
     textSecondary: `${themeColors.textSecondary}`,
     sidebar: `${themeColors.secondary} ${themeColors.border} border-r shadow-lg`,
     sidebarItem: `flex items-center space-x-3 px-4 py-3 cursor-pointer ${themeColors.hover} transition-all duration-200 rounded-lg mx-2 my-1`,
-    sidebarItemActive: `flex items-center space-x-3 px-4 py-3 cursor-pointer ${themeColors.tertiary} ${themeColors.borderSecondary} border-r-4 border-gray-800 rounded-lg mx-2 my-1 shadow-md`,
+    sidebarItemActive: `flex items-center space-x-3 px-4 py-3 cursor-pointer ${themeColors.tertiary} ${themeColors.borderSecondary} border-r-4 border-[#cccccc] rounded-lg mx-2 my-1 shadow-md`,
     sidebarItemText: `${themeColors.textPrimary} font-medium`,
     sidebarItemTextActive: `${themeColors.textAccent} font-semibold`,
     sidebarIcon: `${themeColors.textSecondary}`,
@@ -112,7 +112,7 @@ export const getThemeClasses = (theme, component, variant = 'default') => {
     footer: `${themeColors.textTertiary}`,
     chatInput: `${themeColors.secondary} rounded-lg ${themeColors.borderSecondary} border shadow-lg`,
     chatInputField: `${themeColors.inputBg} ${themeColors.textPrimary} ${themeColors.inputPlaceholder} border ${themeColors.borderSecondary} rounded-lg`,
-    chatSelector: `flex items-center justify-center px-3 py-2 rounded-md cursor-pointer ${themeColors.hover} transition-all duration-200 border ${themeColors.borderTertiary}`,
+    chatSelector: `flex items-center justify-center px-3 py-2 rounded-md cursor-pointer hover:bg-red-500 hover:text-white transition-all duration-200 border ${themeColors.borderTertiary}`,
     chatSelectorText: `${themeColors.textPrimary} font-medium text-sm`,
     chatSelectorIcon: `${themeColors.textSecondary}`,
     chatSendButton: `p-2 rounded-md ${themeColors.hover} transition-all duration-200 ${themeColors.borderSecondary} border`,
@@ -124,6 +124,18 @@ export const getThemeClasses = (theme, component, variant = 'default') => {
     chatMessageText: `${themeColors.textPrimary} leading-relaxed text-sm`,
     chatMessageTime: `${themeColors.textTertiary} text-xs mt-1 opacity-60`,
     chatTyping: `${themeColors.textSecondary} italic`,
+    notificationCard: `${themeColors.card} ${themeColors.border} border shadow-lg`,
+    swapDirectionButton: `${themeColors.card} ${themeColors.border} border shadow-lg`,
+    swapDirectionIcon: `${themeColors.textPrimary}`,
+    connectWalletButton: `border-red-500 text-red-500 hover:bg-red-500 hover:text-white`,
+    notificationDot: `bg-red-500 border-[#cccccc]`,
+    swapActionButton: `hover:bg-red-500 hover:text-white hover:border-[#cccccc]`,
+    notificationIconSuccess: `bg-blue-500`,
+    notificationIconDefault: `bg-gray-600`,
+    notificationSelected: `border-l-4 border-l-[#cccccc]`,
+    notificationAction: `text-blue-400`,
+    userButton: `border-[#cccccc] hover:bg-gray-100 dark:hover:bg-gray-700`,
+    userButtonIcon: `text-gray-600 dark:text-gray-300`,
   };
   
   return componentStyles[component] || '';
