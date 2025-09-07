@@ -5,7 +5,6 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import ChatArea from './components/ChatArea';
 import AuthCallback from './components/AuthCallback';
-import SessionDebug from './components/SessionDebug';
 import AuthFix from './components/AuthFix';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ChatProvider, useChat } from './contexts/ChatContext';
@@ -30,8 +29,6 @@ const AppContent = () => {
         </main>
       </div>
       
-      {/* Debug component - only show in development */}
-      {process.env.NODE_ENV === 'development' && <SessionDebug />}
       
       {/* Auth fix component - runs in background */}
       <AuthFix />
