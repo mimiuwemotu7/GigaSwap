@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { supabase, db } from '../lib/supabase'
 
 const SupabaseContext = createContext({})
@@ -15,6 +15,110 @@ export const SupabaseProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState(null)
+
+  const createUserProfile = useCallback(async (userId, fallbackUserData = null) => {
+    try {
+      console.log('🔄 Creating profile for user:', userId)
+      
+      // Try getUser with timeout
+      let currentUser
+      try {
+        const userPromise = supabase.auth.getUser()
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('getUser timeout')), 3000)
+        )
+        
+        const { data: { user }, error } = await Promise.race([userPromise, timeoutPromise])
+        if (error) throw error
+        currentUser = user
+      } catch (timeoutError) {
+        console.log('⚠️ getUser() timed out, using fallback user data')
+        // Fallback: use the provided user data or context user
+        currentUser = fallbackUserData || user
+        if (!currentUser) {
+          console.error('❌ No user data available for profile creation')
+          return
+        }
+        console.log('✅ Using fallback user data:', currentUser.email)
+      }
+      
+      if (!currentUser) return
+
+      const profileData = {
+        id: userId,
+        email: currentUser.email,
+        username: currentUser.user_metadata?.username || 
+                 currentUser.user_metadata?.name ||
+                 currentUser.email?.split('@')[0] || 
+                 'User',
+        bio: '',
+        wallet_address: '',
+        avatar_url: currentUser.user_metadata?.avatar_url || null
+      }
+
+      console.log('🔍 Creating profile with data:', profileData)
+      
+      try {
+        const newProfile = await db.profiles.create(profileData)
+        console.log('✅ Profile created successfully in database:', newProfile)
+        setProfile(newProfile)
+      } catch (dbError) {
+        console.log('⚠️ Database profile creation failed, creating offline profile')
+        console.log('⚠️ Database error:', dbError.message)
+        
+        // Create an offline profile that we can use locally
+        const offlineProfile = {
+          ...profileData,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          _offline: true // Mark as offline profile
+        }
+        
+        console.log('✅ Created offline profile:', offlineProfile.username)
+        setProfile(offlineProfile)
+      }
+    } catch (error) {
+      console.error('❌ Error creating profile:', error.message)
+      console.error('❌ Profile creation error details:', error)
+    }
+  }, [user])
+
+  const loadUserProfile = useCallback(async (userId, fallbackUserData = null) => {
+    try {
+      console.log('🔄 Loading profile for user:', userId)
+      
+      // Add timeout to the database query
+      console.log('🔍 Starting profile query...')
+      const profilePromise = db.profiles.get(userId)
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Profile query timeout')), 10000)
+      )
+      
+      const profileData = await Promise.race([profilePromise, timeoutPromise])
+      console.log('🔍 Profile query result:', profileData)
+      
+      if (!profileData) {
+        console.log('ℹ️ No profile found, creating new profile...')
+        await createUserProfile(userId, fallbackUserData)
+        return
+      }
+
+      console.log('✅ Profile loaded:', profileData.username || profileData.email)
+      setProfile(profileData)
+    } catch (error) {
+      console.error('❌ Error loading profile:', error.message)
+      console.error('❌ Error details:', error)
+      
+      // Try to create a basic profile as fallback
+      try {
+        console.log('🔄 Attempting to create fallback profile...')
+        await createUserProfile(userId, fallbackUserData)
+      } catch (fallbackError) {
+        console.error('❌ Fallback profile creation failed:', fallbackError.message)
+        console.error('❌ Fallback error details:', fallbackError)
+      }
+    }
+  }, [createUserProfile])
 
   useEffect(() => {
     let mounted = true
@@ -146,109 +250,7 @@ export const SupabaseProvider = ({ children }) => {
     }
   }, [loadUserProfile])
 
-  const loadUserProfile = async (userId, fallbackUserData = null) => {
-    try {
-      console.log('🔄 Loading profile for user:', userId)
-      
-      // Add timeout to the database query
-      console.log('🔍 Starting profile query...')
-      const profilePromise = db.profiles.get(userId)
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Profile query timeout')), 10000)
-      )
-      
-      const profileData = await Promise.race([profilePromise, timeoutPromise])
-      console.log('🔍 Profile query result:', profileData)
-      
-      if (!profileData) {
-        console.log('ℹ️ No profile found, creating new profile...')
-        await createUserProfile(userId, fallbackUserData)
-        return
-      }
 
-      console.log('✅ Profile loaded:', profileData.username || profileData.email)
-      setProfile(profileData)
-    } catch (error) {
-      console.error('❌ Error loading profile:', error.message)
-      console.error('❌ Error details:', error)
-      
-      // Try to create a basic profile as fallback
-      try {
-        console.log('🔄 Attempting to create fallback profile...')
-        await createUserProfile(userId, fallbackUserData)
-      } catch (fallbackError) {
-        console.error('❌ Fallback profile creation failed:', fallbackError.message)
-        console.error('❌ Fallback error details:', fallbackError)
-      }
-    }
-  }
-
-  const createUserProfile = async (userId, fallbackUserData = null) => {
-    try {
-      console.log('🔄 Creating profile for user:', userId)
-      
-      // Try getUser with timeout
-      let currentUser
-      try {
-        const userPromise = supabase.auth.getUser()
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('getUser timeout')), 3000)
-        )
-        
-        const { data: { user }, error } = await Promise.race([userPromise, timeoutPromise])
-        if (error) throw error
-        currentUser = user
-      } catch (timeoutError) {
-        console.log('⚠️ getUser() timed out, using fallback user data')
-        // Fallback: use the provided user data or context user
-        currentUser = fallbackUserData || user
-        if (!currentUser) {
-          console.error('❌ No user data available for profile creation')
-          return
-        }
-        console.log('✅ Using fallback user data:', currentUser.email)
-      }
-      
-      if (!currentUser) return
-
-      const profileData = {
-        id: userId,
-        email: currentUser.email,
-        username: currentUser.user_metadata?.username || 
-                 currentUser.user_metadata?.name ||
-                 currentUser.email?.split('@')[0] || 
-                 'User',
-        bio: '',
-        wallet_address: '',
-        avatar_url: currentUser.user_metadata?.avatar_url || null
-      }
-
-      console.log('🔍 Creating profile with data:', profileData)
-      
-      try {
-        const newProfile = await db.profiles.create(profileData)
-        console.log('✅ Profile created successfully in database:', newProfile)
-        setProfile(newProfile)
-      } catch (dbError) {
-        console.log('⚠️ Database profile creation failed, creating offline profile')
-        console.log('⚠️ Database error:', dbError.message)
-        
-        // Create an offline profile that we can use locally
-        const offlineProfile = {
-          ...profileData,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          _offline: true // Mark as offline profile
-        }
-        
-        console.log('✅ Created offline profile:', offlineProfile.username)
-        setProfile(offlineProfile)
-      }
-    } catch (error) {
-      console.error('❌ Error creating profile:', error.message)
-      console.error('❌ Profile creation error details:', error)
-    }
-  }
 
   const refreshProfile = async () => {
     if (!user) return
