@@ -128,7 +128,6 @@ let currentUser = null
 supabase.auth.onAuthStateChange((event, session) => {
   
   if (event === 'INITIAL_SESSION') {
-    sessionRestored = true
     currentUser = session?.user || null
     
     if (session?.user) {

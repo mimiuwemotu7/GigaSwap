@@ -21,7 +21,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "proxy": "node proxy-server.js",
-    "dev": "concurrently \"npm run proxy\" \"npm start\""
+    "dev": "concurrently \"npm run proxy\" \"npm start\"",
+    "start:prod": "serve -s build -l 3000",
+    "proxy:prod": "node proxy-server.js"
   },
   "eslintConfig": {
     "extends": [
