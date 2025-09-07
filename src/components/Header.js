@@ -1,28 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { User, Bell, Menu, Wallet, MessageCircle, Coins, ChevronDown, Plus, Trash2, Clock, X, LogIn } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Bell, Menu, Wallet, MessageCircle, Coins, ChevronDown, Plus, Trash2, Clock, X, LogIn } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useChat } from '../contexts/ChatContext';
+// Auth removed: no useSupabase
 import { useSupabase } from '../contexts/SupabaseContext';
+import AuthModal from './AuthModal';
+import UserProfile from './UserProfile';
 import { getThemeClasses } from '../themes/themeConfig';
 import ThemeSelector from './ThemeSelector';
 import NotificationCard from './NotificationCard';
-import AuthModal from './AuthModal';
-import UserProfile from './UserProfile';
+import { useToast } from './ToastContext';
 
 const Header = () => {
   const { currentTheme } = useTheme();
   const { currentChatId, setCurrentChatId, createNewChat, deleteChat, chatHistory } = useChat();
-  const { user, profile, loading } = useSupabase();
-  
-  // Debug logging
-  console.log('Header: user state:', user);
-  console.log('Header: profile state:', profile);
-  console.log('Header: loading state:', loading);
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showUserProfile, setShowUserProfile] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [isSwipeActive, setIsSwipeActive] = useState(false);
@@ -248,16 +243,7 @@ const Header = () => {
               setSelectedNotification={setSelectedNotification}
             />
             
-          <button 
-            onClick={() => user ? setShowUserProfile(true) : setShowAuthModal(true)}
-            className={`hidden md:block p-2 rounded-full border transition-all duration-200 bg-transparent flex items-center justify-center ${getThemeClasses(currentTheme, 'userButton')}`}
-          >
-            {user ? (
-              <User className={`w-4 h-4 ${getThemeClasses(currentTheme, 'userButtonIcon')}`} />
-            ) : (
-              <LogIn className={`w-4 h-4 ${getThemeClasses(currentTheme, 'userButtonIcon')}`} />
-            )}
-          </button>
+          <AuthControls currentTheme={currentTheme} />
           <ThemeSelector />
           {/* Mobile hamburger menu button - moved to right side */}
           <button 
@@ -312,24 +298,9 @@ const Header = () => {
               
               {/* Drawer Content */}
               <div className="p-4 space-y-4 overflow-y-auto h-[calc(100vh-80px)]">
-                {/* Profile */}
+                {/* Profile / Auth */}
                 <div className="space-y-2">
-                  <button 
-                    onClick={() => {
-                      user ? setShowUserProfile(true) : setShowAuthModal(true);
-                      setShowMobileMenu(false);
-                    }}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg ${getThemeClasses(currentTheme, 'hover')} transition-all duration-200`}
-                  >
-                    {user ? (
-                      <User className={`w-5 h-5 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
-                    ) : (
-                      <LogIn className={`w-5 h-5 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
-                    )}
-                    <span className={`${getThemeClasses(currentTheme, 'textPrimary')} font-medium text-sm md:text-base`}>
-                      {user ? 'Profile' : 'Sign In'}
-                    </span>
-                  </button>
+                  <MobileAuthControls currentTheme={currentTheme} setShowMobileMenu={setShowMobileMenu} />
                 </div>
 
                 {/* Chats Section */}
@@ -447,19 +418,315 @@ const Header = () => {
       </div>
     </header>
 
-    {/* Auth Modal */}
-    <AuthModal 
-      isOpen={showAuthModal} 
-      onClose={() => setShowAuthModal(false)} 
-    />
-
-    {/* User Profile Modal */}
-    <UserProfile 
-      isOpen={showUserProfile} 
-      onClose={() => setShowUserProfile(false)} 
-    />
+  {/* Auth/UI removed */}
     </>
   );
 };
 
+// Small auth controls component (desktop)
+function AuthControls({ currentTheme }) {
+  const { user, signOut } = useSupabase();
+  const { addToast } = useToast();
+  const [showModal, setShowModal] = React.useState(false);
+  const modalRef = React.useRef(null);
+  const [signingOut, setSigningOut] = React.useState(false);
+  const [showProfile, setShowProfile] = React.useState(false);
+  const [showDropdown, setShowDropdown] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!showModal) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') setShowModal(false);
+    };
+    document.addEventListener('keydown', onKey);
+    setTimeout(() => {
+      const el = modalRef.current?.querySelector('input, button, [tabindex]:not([tabindex="-1"])');
+      if (el && typeof el.focus === 'function') el.focus();
+    }, 0);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [showModal]);
+
+  return (
+    <>
+      {user ? (
+        <div className="relative">
+          <button
+            onClick={() => setShowDropdown(!showDropdown)}
+            className={`hidden md:flex items-center space-x-2 p-1.5 rounded-full cursor-pointer transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 ${getThemeClasses(currentTheme, 'userButton')}`}
+            aria-haspopup="menu"
+            aria-expanded={showDropdown}
+          >
+            {user?.user_metadata?.avatar_url ? (
+              <img src={user.user_metadata.avatar_url} alt="avatar" className="w-8 h-8 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-white font-bold text-sm border-2 border-gray-200 dark:border-gray-600">
+                {(user.email || '').slice(0,2).toUpperCase()}
+              </div>
+            )}
+            <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showDropdown ? 'rotate-180' : ''} ${getThemeClasses(currentTheme, 'textSecondary')}`} />
+          </button>
+
+          {showDropdown && (
+            <div 
+              role="menu" 
+              aria-label="User menu" 
+              className={`absolute right-0 mt-2 w-48 rounded-lg shadow-xl border ${getThemeClasses(currentTheme, 'border')} ${getThemeClasses(currentTheme, 'container')} py-1 z-50`} 
+              onMouseLeave={() => setShowDropdown(false)}
+            >
+              <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+                <div className={`text-xs font-medium ${getThemeClasses(currentTheme, 'textSecondary')} uppercase tracking-wide`}>
+                  {user?.email}
+                </div>
+              </div>
+              <button 
+                className={`w-full text-left px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 ${getThemeClasses(currentTheme, 'textPrimary')} flex items-center space-x-2`} 
+                onClick={() => { setShowProfile(true); setShowDropdown(false); }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span>Profile</span>
+              </button>
+              <button 
+                className={`w-full text-left px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 ${getThemeClasses(currentTheme, 'textPrimary')} flex items-center space-x-2`} 
+                onClick={() => { setSigningOut(true); signOut(); addToast('Signed out — see you next time!', 'info'); setShowDropdown(false); setTimeout(() => setSigningOut(false), 700); }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span>Sign out</span>
+              </button>
+            </div>
+          )}
+
+          {showProfile && createPortal(
+            <div 
+              role="presentation" 
+              aria-hidden={!showProfile} 
+              className="fixed bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
+              onClick={() => setShowProfile(false)}
+              style={{ 
+                top: 0, 
+                left: 0, 
+                right: 0, 
+                bottom: 0, 
+                width: '100vw', 
+                height: '100vh',
+                margin: 0,
+                padding: 0,
+                position: 'fixed',
+                zIndex: 9999
+              }}
+            >
+              <div 
+                role="dialog" 
+                aria-modal="true" 
+                onClick={(e) => e.stopPropagation()} 
+                className="w-full max-w-lg mx-4"
+              >
+                <UserProfile onClose={() => setShowProfile(false)} />
+              </div>
+            </div>,
+            document.body
+          )}
+        </div>
+      ) : (
+        <>
+          <button
+            onClick={() => setShowModal(true)}
+            aria-haspopup="dialog"
+            aria-expanded={showModal}
+            className={`hidden md:block p-2 rounded-full border transition-all duration-200 bg-transparent flex items-center justify-center ${getThemeClasses(currentTheme, 'userButton')}`}
+          >
+            <LogIn className={`w-4 h-4 ${getThemeClasses(currentTheme, 'userButtonIcon')}`} />
+          </button>
+          {showModal && createPortal(
+            <div
+              role="presentation"
+              aria-hidden={!showModal}
+              className="fixed bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
+              onClick={() => setShowModal(false)}
+              style={{ 
+                top: 0, 
+                left: 0, 
+                right: 0, 
+                bottom: 0, 
+                width: '100vw', 
+                height: '100vh',
+                margin: 0,
+                padding: 0,
+                position: 'fixed',
+                zIndex: 9999
+              }}
+            >
+              <div
+                ref={modalRef}
+                role="dialog"
+                aria-modal="true"
+                onClick={(e) => e.stopPropagation()}
+                className={`${getThemeClasses(currentTheme, 'container')} w-full max-w-md mx-4 shadow-2xl border ${getThemeClasses(currentTheme, 'border')} rounded-2xl`}
+                style={{ maxWidth: 'min(400px, calc(100vw - 2rem))' }}
+              >
+                <AuthModal />
+                <div className="mt-2 text-right">
+                  <button 
+                    onClick={() => setShowModal(false)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${getThemeClasses(currentTheme, 'buttonSecondary')} ${getThemeClasses(currentTheme, 'buttonSecondaryHover')} ${getThemeClasses(currentTheme, 'textPrimary')}`}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>,
+            document.body
+          )}
+        </>
+      )}
+    </>
+  );
+}
+
+// Mobile auth controls used in the side drawer
+function MobileAuthControls({ currentTheme, setShowMobileMenu }) {
+  const { user, signOut } = useSupabase();
+  const { addToast } = useToast();
+  const [showModal, setShowModal] = React.useState(false);
+  const modalRef = React.useRef(null);
+  const [signingOutMobile, setSigningOutMobile] = React.useState(false);
+  const [showProfileMobile, setShowProfileMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!showModal) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') setShowModal(false);
+    };
+    document.addEventListener('keydown', onKey);
+    setTimeout(() => {
+      const el = modalRef.current?.querySelector('input, button, [tabindex]:not([tabindex="-1"])');
+      if (el && typeof el.focus === 'function') el.focus();
+    }, 0);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [showModal]);
+
+  return (
+    <>
+      {user ? (
+        <>
+          <button
+            onClick={() => setShowProfileMobile(true)}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg ${getThemeClasses(currentTheme, 'hover')} transition-all duration-200`}
+          >
+            {user?.user_metadata?.avatar_url ? (
+              <img src={user.user_metadata.avatar_url} alt="avatar" className="w-8 h-8 rounded-full object-cover" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-white font-bold text-sm">{(user.email || '').slice(0,2).toUpperCase()}</div>
+            )}
+            <div className={`${getThemeClasses(currentTheme, 'textPrimary')} font-medium`}>{user.email}</div>
+            <div className="ml-auto">
+              <ChevronDown className={`w-4 h-4 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
+            </div>
+          </button>
+          {showProfileMobile && createPortal(
+            <div 
+              role="presentation" 
+              aria-hidden={!showProfileMobile} 
+              className="fixed bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
+              onClick={() => setShowProfileMobile(false)}
+              style={{ 
+                top: 0, 
+                left: 0, 
+                right: 0, 
+                bottom: 0, 
+                width: '100vw', 
+                height: '100vh',
+                margin: 0,
+                padding: 0,
+                position: 'fixed',
+                zIndex: 9999
+              }}
+            >
+              <div 
+                role="dialog" 
+                aria-modal="true" 
+                onClick={(e) => e.stopPropagation()} 
+                className={`w-full max-w-sm mx-4 rounded-xl shadow-2xl border ${getThemeClasses(currentTheme, 'border')} ${getThemeClasses(currentTheme, 'container')} p-4`}
+              >
+                <div className="space-y-3">
+                  <button 
+                    onClick={() => { setShowProfileMobile(false); setShowMobileMenu(false); }} 
+                    className={`w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 ${getThemeClasses(currentTheme, 'textPrimary')} flex items-center space-x-2`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    <span>Profile</span>
+                  </button>
+                  <button 
+                    onClick={() => { setSigningOutMobile(true); signOut(); addToast('Signed out — see you next time!', 'info'); setTimeout(() => { setSigningOutMobile(false); setShowMobileMenu(false); }, 700); }} 
+                    className={`w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 ${getThemeClasses(currentTheme, 'textPrimary')} flex items-center space-x-2`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Sign out</span>
+                  </button>
+                </div>
+              </div>
+            </div>,
+            document.body
+          )}
+        </>
+      ) : (
+        <>
+          <button
+            onClick={() => { setShowModal(true); setShowMobileMenu(false); }}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg ${getThemeClasses(currentTheme, 'hover')} transition-all duration-200`}
+          >
+            <LogIn className={`w-5 h-5 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
+            <span className={`${getThemeClasses(currentTheme, 'textPrimary')} font-medium text-sm md:text-base`}>Sign In</span>
+          </button>
+          {showModal && createPortal(
+            <div 
+              role="presentation" 
+              aria-hidden={!showModal} 
+              className="fixed bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
+              onClick={() => setShowModal(false)}
+              style={{ 
+                top: 0, 
+                left: 0, 
+                right: 0, 
+                bottom: 0, 
+                width: '100vw', 
+                height: '100vh',
+                margin: 0,
+                padding: 0,
+                position: 'fixed',
+                zIndex: 9999
+              }}
+            >
+              <div 
+                ref={modalRef} 
+                role="dialog" 
+                aria-modal="true" 
+                onClick={(e) => e.stopPropagation()} 
+                className={`${getThemeClasses(currentTheme, 'container')} w-full max-w-sm mx-4 shadow-2xl border ${getThemeClasses(currentTheme, 'border')} rounded-2xl`}
+              >
+                <AuthModal />
+                <div className="mt-2 text-right">
+                  <button 
+                    onClick={() => setShowModal(false)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${getThemeClasses(currentTheme, 'buttonSecondary')} ${getThemeClasses(currentTheme, 'buttonSecondaryHover')} ${getThemeClasses(currentTheme, 'textPrimary')}`}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>,
+            document.body
+          )}
+        </>
+      )}
+    </>
+  );
+}
 export default Header;

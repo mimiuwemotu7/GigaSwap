@@ -1,17 +1,23 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import ChatArea from './components/ChatArea';
-import AuthCallback from './components/AuthCallback';
-import AuthFix from './components/AuthFix';
+import LoginPage from './components/LoginPage';
+// Auth-related components removed
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ChatProvider, useChat } from './contexts/ChatContext';
-import { SupabaseProvider } from './contexts/SupabaseContext';
+import { useSupabase } from './contexts/SupabaseContext';
 
 const AppContent = () => {
   const { messages, isTyping } = useChat();
+  const { user } = useSupabase();
+
+  // Redirect to login if not authenticated
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="App h-screen">
@@ -28,10 +34,6 @@ const AppContent = () => {
           <ChatArea messages={messages} isTyping={isTyping} />
         </main>
       </div>
-      
-      
-      {/* Auth fix component - runs in background */}
-      <AuthFix />
     </div>
   );
 };
@@ -39,16 +41,15 @@ const AppContent = () => {
 function App() {
   return (
     <Router>
-      <SupabaseProvider>
-        <ThemeProvider>
+      <ThemeProvider>
           <ChatProvider>
             <Routes>
-              <Route path="/auth/callback" element={<AuthCallback />} />
-              <Route path="/*" element={<AppContent />} />
+              <Route path="/" element={<LoginPage />} />
+              <Route path="/app" element={<AppContent />} />
+              <Route path="/*" element={<Navigate to="/" replace />} />
             </Routes>
           </ChatProvider>
         </ThemeProvider>
-      </SupabaseProvider>
     </Router>
   );
 }

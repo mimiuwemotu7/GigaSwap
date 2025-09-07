@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
+import { ToastProvider } from './components/ToastContext';
+import { SupabaseProvider } from './contexts/SupabaseContext';
 
 // Error boundary component
 class ErrorBoundary extends React.Component {
@@ -124,7 +126,11 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ErrorBoundary>
-      <App />
+      <SupabaseProvider>
+        <ToastProvider>
+          <App />
+        </ToastProvider>
+      </SupabaseProvider>
     </ErrorBoundary>
   </React.StrictMode>
 );
