@@ -19,8 +19,22 @@ console.log('Using Key:', supabaseAnonKey ? 'Present' : 'Missing')
 
 // Helper function to use custom fetch for all requests
 const customFetch = (url, options = {}) => {
+  // Debug environment
+  console.log('🔍 Environment check:', {
+    NODE_ENV: process.env.NODE_ENV,
+    hostname: typeof window !== 'undefined' ? window.location.hostname : 'undefined',
+    isDevelopment: process.env.NODE_ENV === 'development',
+    isProduction: process.env.NODE_ENV === 'production',
+    windowExists: typeof window !== 'undefined'
+  })
+  
+  // Check if we're in development (proxy available) vs production
+  const isDevelopment = process.env.NODE_ENV === 'development' || 
+                       window.location.hostname === 'localhost' ||
+                       window.location.hostname === '127.0.0.1'
+  
   // In development, route requests through the backend proxy server
-  if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
+  if (isDevelopment && typeof window !== 'undefined') {
     const proxyUrl = url.replace(supabaseUrl, 'http://localhost:3001/supabase')
     console.log('🔄 Proxying request:', url, '→', proxyUrl)
     return fetch(proxyUrl, options)
