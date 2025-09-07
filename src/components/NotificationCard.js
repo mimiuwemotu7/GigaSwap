@@ -77,7 +77,7 @@ const NotificationCard = ({
   if (!showNotifications) return null;
 
   return (
-    <div className="absolute top-full right-0 mt-2 w-80 max-w-[90vw] z-50" ref={notificationRef}>
+    <div className="absolute top-full right-8 mt-2 w-80 max-w-[90vw] z-50" ref={notificationRef}>
       <div className={`${getThemeClasses(currentTheme, 'notificationCard')} rounded-lg`}>
         {/* Notification Header */}
         <div className={`flex items-center justify-between p-3 border-b ${getThemeClasses(currentTheme, 'notificationHeaderBorder')}`}>

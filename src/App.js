@@ -1,10 +1,15 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import ChatArea from './components/ChatArea';
+import AuthCallback from './components/AuthCallback';
+import SessionDebug from './components/SessionDebug';
+import AuthFix from './components/AuthFix';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ChatProvider, useChat } from './contexts/ChatContext';
+import { SupabaseProvider } from './contexts/SupabaseContext';
 
 const AppContent = () => {
   const { messages, isTyping } = useChat();
@@ -24,17 +29,30 @@ const AppContent = () => {
           <ChatArea messages={messages} isTyping={isTyping} />
         </main>
       </div>
+      
+      {/* Debug component - only show in development */}
+      {process.env.NODE_ENV === 'development' && <SessionDebug />}
+      
+      {/* Auth fix component - runs in background */}
+      <AuthFix />
     </div>
   );
 };
 
 function App() {
   return (
-    <ThemeProvider>
-      <ChatProvider>
-        <AppContent />
-      </ChatProvider>
-    </ThemeProvider>
+    <Router>
+      <SupabaseProvider>
+        <ThemeProvider>
+          <ChatProvider>
+            <Routes>
+              <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/*" element={<AppContent />} />
+            </Routes>
+          </ChatProvider>
+        </ThemeProvider>
+      </SupabaseProvider>
+    </Router>
   );
 }
 

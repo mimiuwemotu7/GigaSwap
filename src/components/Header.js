@@ -1,61 +1,114 @@
 import React, { useState, useEffect } from 'react';
-import { User, Bell, Menu, Wallet, MessageCircle, Coins, ChevronDown, Plus, Trash2, Clock, X } from 'lucide-react';
+import { User, Bell, Menu, Wallet, MessageCircle, Coins, ChevronDown, Plus, Trash2, Clock, X, LogIn } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useChat } from '../contexts/ChatContext';
+import { useSupabase } from '../contexts/SupabaseContext';
 import { getThemeClasses } from '../themes/themeConfig';
 import ThemeSelector from './ThemeSelector';
 import NotificationCard from './NotificationCard';
+import AuthModal from './AuthModal';
+import UserProfile from './UserProfile';
 
 const Header = () => {
   const { currentTheme } = useTheme();
   const { currentChatId, setCurrentChatId, createNewChat, deleteChat, chatHistory } = useChat();
+  const { user, profile, loading } = useSupabase();
+  
+  // Debug logging
+  console.log('Header: user state:', user);
+  console.log('Header: profile state:', profile);
+  console.log('Header: loading state:', loading);
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showUserProfile, setShowUserProfile] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
+  const [isSwipeActive, setIsSwipeActive] = useState(false);
+  const [swipeProgress, setSwipeProgress] = useState(0);
   const [showChatHistory, setShowChatHistory] = useState(false);
   const [showTokensDropdown, setShowTokensDropdown] = useState(false);
 
   // Swipe detection constants
   const minSwipeDistance = 50;
+  const edgeDetectionWidth = 30;
+  const menuWidth = 320; // Width of the mobile menu
 
   // Global touch events for swipe functionality
   useEffect(() => {
     const handleTouchStart = (e) => {
       if (e.targetTouches && e.targetTouches[0]) {
         const startX = e.targetTouches[0].clientX;
-        setTouchStart(startX);
-        setTouchEnd(null);
+        const startY = e.targetTouches[0].clientY;
+        
+        // Only start swipe detection from left edge or if menu is open
+        if (startX <= edgeDetectionWidth || showMobileMenu) {
+          setTouchStart({ x: startX, y: startY });
+          setTouchEnd(null);
+          setIsSwipeActive(true);
+          setSwipeProgress(0);
+        }
       }
     };
 
     const handleTouchMove = (e) => {
-      if (e.targetTouches && e.targetTouches[0]) {
-        setTouchEnd(e.targetTouches[0].clientX);
+      if (e.targetTouches && e.targetTouches[0] && isSwipeActive && touchStart) {
+        const currentX = e.targetTouches[0].clientX;
+        const currentY = e.targetTouches[0].clientY;
+        
+        // Check if it's a horizontal swipe (not vertical scroll)
+        const deltaX = currentX - touchStart.x;
+        const deltaY = Math.abs(currentY - touchStart.y);
+        
+        if (deltaY < 100) { // Only if it's more horizontal than vertical
+          setTouchEnd({ x: currentX, y: currentY });
+          
+          // Calculate swipe progress for visual feedback
+          if (showMobileMenu) {
+            // Closing menu - swipe left
+            const progress = Math.max(0, Math.min(1, -deltaX / menuWidth));
+            setSwipeProgress(progress);
+          } else {
+            // Opening menu - swipe right
+            const progress = Math.max(0, Math.min(1, deltaX / menuWidth));
+            setSwipeProgress(progress);
+          }
+        }
       }
     };
 
     const handleTouchEnd = () => {
-      if (!touchStart || !touchEnd) return;
-      
-      const distance = touchStart - touchEnd;
-      const isLeftSwipe = distance > minSwipeDistance;
-      const isRightSwipe = distance < -minSwipeDistance;
-      
-      // Open menu with right swipe (anywhere on screen)
-      if (isRightSwipe && !showMobileMenu) {
-        setShowMobileMenu(true);
+      if (!touchStart || !touchEnd || !isSwipeActive) {
+        setIsSwipeActive(false);
+        setSwipeProgress(0);
+        return;
       }
       
-      // Close menu with left swipe (anywhere on screen)
-      if (isLeftSwipe && showMobileMenu) {
-        setShowMobileMenu(false);
+      const deltaX = touchEnd.x - touchStart.x;
+      const deltaY = Math.abs(touchEnd.y - touchStart.y);
+      
+      // Only process horizontal swipes
+      if (deltaY < 100) {
+        const isLeftSwipe = deltaX < -minSwipeDistance;
+        const isRightSwipe = deltaX > minSwipeDistance;
+        
+        // Open menu with right swipe from left edge
+        if (isRightSwipe && !showMobileMenu && touchStart.x <= edgeDetectionWidth) {
+          setShowMobileMenu(true);
+        }
+        
+        // Close menu with left swipe
+        if (isLeftSwipe && showMobileMenu) {
+          setShowMobileMenu(false);
+        }
       }
       
       // Reset touch values
       setTouchStart(null);
       setTouchEnd(null);
+      setIsSwipeActive(false);
+      setSwipeProgress(0);
     };
 
     // Add touch events to document
@@ -69,7 +122,7 @@ const Header = () => {
       document.removeEventListener('touchmove', handleTouchMove);
       document.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [touchStart, touchEnd, showMobileMenu, minSwipeDistance]);
+  }, [touchStart, touchEnd, showMobileMenu, isSwipeActive, minSwipeDistance, edgeDetectionWidth, menuWidth]);
 
   // Helper functions from Sidebar
   const formatDate = (timestamp) => {
@@ -148,9 +201,18 @@ const Header = () => {
   ];
 
   return (
-    <header 
-      className={`w-full py-4 px-6 ${getThemeClasses(currentTheme, 'headerContainer')}`}
-    >
+    <>
+      {/* Left Edge Swipe Indicator (only visible during swipe) */}
+      {isSwipeActive && !showMobileMenu && (
+        <div 
+          className="fixed top-0 left-0 h-full w-1 bg-red-500 z-50 transition-opacity duration-200"
+          style={{ opacity: swipeProgress * 0.5 }}
+        />
+      )}
+      
+      <header 
+        className={`w-full py-4 px-6 ${getThemeClasses(currentTheme, 'headerContainer')}`}
+      >
       <div className="w-full flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <img src="/icon2.png" alt="GigaSwap" className="w-8 h-8" />
@@ -186,8 +248,15 @@ const Header = () => {
               setSelectedNotification={setSelectedNotification}
             />
             
-          <button className={`hidden md:block p-2 rounded-full border transition-all duration-200 bg-transparent flex items-center justify-center ${getThemeClasses(currentTheme, 'userButton')}`}>
-            <User className={`w-4 h-4 ${getThemeClasses(currentTheme, 'userButtonIcon')}`} />
+          <button 
+            onClick={() => user ? setShowUserProfile(true) : setShowAuthModal(true)}
+            className={`hidden md:block p-2 rounded-full border transition-all duration-200 bg-transparent flex items-center justify-center ${getThemeClasses(currentTheme, 'userButton')}`}
+          >
+            {user ? (
+              <User className={`w-4 h-4 ${getThemeClasses(currentTheme, 'userButtonIcon')}`} />
+            ) : (
+              <LogIn className={`w-4 h-4 ${getThemeClasses(currentTheme, 'userButtonIcon')}`} />
+            )}
           </button>
           <ThemeSelector />
           {/* Mobile hamburger menu button - moved to right side */}
@@ -214,11 +283,20 @@ const Header = () => {
         
         {/* Side Drawer */}
         <div 
-          className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] z-50 slide-drawer-right ${
-            showMobileMenu ? 'open' : ''
+          className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] z-50 transition-transform duration-300 ease-out ${
+            showMobileMenu ? 'translate-x-0' : '-translate-x-full'
           }`}
+          style={{
+            transform: isSwipeActive && !showMobileMenu 
+              ? `translateX(${swipeProgress * 100 - 100}%)` 
+              : isSwipeActive && showMobileMenu 
+                ? `translateX(${-swipeProgress * 100}%)` 
+                : showMobileMenu 
+                  ? 'translateX(0)' 
+                  : 'translateX(-100%)'
+          }}
         >
-            <div className={`h-full ${getThemeClasses(currentTheme, 'headerContainer')} border-l ${getThemeClasses(currentTheme, 'border')} shadow-xl`}>
+            <div className={`h-full ${getThemeClasses(currentTheme, 'headerContainer')} border-r ${getThemeClasses(currentTheme, 'border')} shadow-xl`}>
               {/* Drawer Header */}
               <div className="flex items-center justify-between p-4 border-b border-gray-700">
                 <button 
@@ -236,9 +314,21 @@ const Header = () => {
               <div className="p-4 space-y-4 overflow-y-auto h-[calc(100vh-80px)]">
                 {/* Profile */}
                 <div className="space-y-2">
-                  <button className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg ${getThemeClasses(currentTheme, 'hover')} transition-all duration-200`}>
-                    <User className={`w-5 h-5 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
-                    <span className={`${getThemeClasses(currentTheme, 'textPrimary')} font-medium text-sm md:text-base`}>Profile</span>
+                  <button 
+                    onClick={() => {
+                      user ? setShowUserProfile(true) : setShowAuthModal(true);
+                      setShowMobileMenu(false);
+                    }}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg ${getThemeClasses(currentTheme, 'hover')} transition-all duration-200`}
+                  >
+                    {user ? (
+                      <User className={`w-5 h-5 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
+                    ) : (
+                      <LogIn className={`w-5 h-5 ${getThemeClasses(currentTheme, 'textSecondary')}`} />
+                    )}
+                    <span className={`${getThemeClasses(currentTheme, 'textPrimary')} font-medium text-sm md:text-base`}>
+                      {user ? 'Profile' : 'Sign In'}
+                    </span>
                   </button>
                 </div>
 
@@ -356,6 +446,19 @@ const Header = () => {
         </div>
       </div>
     </header>
+
+    {/* Auth Modal */}
+    <AuthModal 
+      isOpen={showAuthModal} 
+      onClose={() => setShowAuthModal(false)} 
+    />
+
+    {/* User Profile Modal */}
+    <UserProfile 
+      isOpen={showUserProfile} 
+      onClose={() => setShowUserProfile(false)} 
+    />
+    </>
   );
 };
 
