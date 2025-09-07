@@ -144,7 +144,7 @@ export const SupabaseProvider = ({ children }) => {
       mounted = false
       subscription.unsubscribe()
     }
-  }, [])
+  }, [loadUserProfile])
 
   const loadUserProfile = async (userId, fallbackUserData = null) => {
     try {

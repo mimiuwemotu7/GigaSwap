@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, LogOut, Settings, Wallet, Edit3, X } from 'lucide-react';
+import { User, LogOut, Edit3, X } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useSupabase } from '../contexts/SupabaseContext';
 import { getThemeClasses } from '../themes/themeConfig';

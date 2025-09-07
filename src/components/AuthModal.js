@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Mail, Lock, User, Eye, EyeOff, Chrome, Wallet } from 'lucide-react';
+import { X, Eye, EyeOff, Wallet } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useSupabase } from '../contexts/SupabaseContext';
 import { getThemeClasses } from '../themes/themeConfig';
@@ -40,7 +40,7 @@ const AuthModal = ({ isOpen, onClose }) => {
 
     try {
       if (isLogin) {
-        const { data, error } = await signIn(formData.email, formData.password);
+        const { error } = await signIn(formData.email, formData.password);
         if (error) {
           throw error;
         }
@@ -48,7 +48,7 @@ const AuthModal = ({ isOpen, onClose }) => {
         console.log('Login successful, closing modal');
         onClose();
       } else {
-        const { data, error } = await signUp(formData.email, formData.password, {
+        const { error } = await signUp(formData.email, formData.password, {
           username: formData.username
         });
         if (error) {
@@ -83,7 +83,7 @@ const AuthModal = ({ isOpen, onClose }) => {
     setError('');
     try {
       console.log('Starting Google authentication...');
-      const { data, error } = await signInWithGoogle();
+      const { error } = await signInWithGoogle();
       
       if (error) {
         console.error('Google auth error:', error);
@@ -281,9 +281,9 @@ const AuthModal = ({ isOpen, onClose }) => {
           <div className="text-center pt-4">
             <p className={`text-xs ${getThemeClasses(currentTheme, 'textSecondary')}`}>
               By creating an account, you agree to GigaSwap's{' '}
-              <a href="#" className="text-blue-400 hover:underline">Privacy Policy</a>
+              <button type="button" className="text-blue-400 hover:underline">Privacy Policy</button>
               {' '}and{' '}
-              <a href="#" className="text-blue-400 hover:underline">Terms of Service</a>.
+              <button type="button" className="text-blue-400 hover:underline">Terms of Service</button>.
             </p>
           </div>
         </form>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { useSupabase } from '../contexts/SupabaseContext'
-import { supabase } from '../lib/supabase'
 
 // Debug component to help troubleshoot session issues
 export const SessionDebug = () => {
@@ -276,6 +275,7 @@ export const SessionDebug = () => {
     }
   }
 
+  // eslint-disable-next-line no-unused-vars
   const inspectToken = () => {
     addLog('Inspecting stored token...')
     try {
@@ -308,6 +308,7 @@ export const SessionDebug = () => {
     }
   }
 
+  // eslint-disable-next-line no-unused-vars
   const checkContextState = () => {
     addLog('Checking SupabaseContext state...')
     addLog(`Context user: ${user ? user.email : 'null'}`)
@@ -332,6 +333,7 @@ export const SessionDebug = () => {
     })
   }
 
+  // eslint-disable-next-line no-unused-vars
   const forceStopLoading = () => {
     addLog('Attempting to force stop loading...')
     addLog('Note: This requires context modification to work properly')
@@ -340,6 +342,7 @@ export const SessionDebug = () => {
     addLog('Cannot force stop loading from debug component')
   }
 
+  // eslint-disable-next-line no-unused-vars
   const testSignOut = async () => {
     addLog('Testing sign out...')
     try {
@@ -364,6 +367,7 @@ export const SessionDebug = () => {
     }
   }
 
+  // eslint-disable-next-line no-unused-vars
   const resendVerification = async () => {
     addLog('Attempting to resend verification email...')
     try {
@@ -382,6 +386,7 @@ export const SessionDebug = () => {
     }
   }
 
+  // eslint-disable-next-line no-unused-vars
   const testSessionRestore = async () => {
     addLog('Testing session restoration...')
     try {
@@ -431,7 +436,7 @@ export const SessionDebug = () => {
       addLog('Testing profile creation...')
       
       // Test database connectivity first
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('profiles')
         .select('count')
         .limit(1)
