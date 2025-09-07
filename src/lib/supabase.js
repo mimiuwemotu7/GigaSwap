@@ -123,7 +123,6 @@ const validateExistingSessions = () => {
 // Initialize auth state tracking
 let authStateInitialized = false
 let currentUser = null
-let sessionRestored = false
 
 // Listen for auth state changes to track session restoration
 supabase.auth.onAuthStateChange((event, session) => {
