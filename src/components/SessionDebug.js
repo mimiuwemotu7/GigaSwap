@@ -15,15 +15,6 @@ export const SessionDebug = () => {
     setLogs(prev => [...prev.slice(-9), `${new Date().toLocaleTimeString()}: ${message}`])
   }
 
-  // Custom fetch function to use proxy in development
-  const customFetch = (url, options = {}) => {
-    if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.REACT_APP_SUPABASE_URL
-      const proxyUrl = url.replace(supabaseUrl, 'http://localhost:3001/supabase')
-      return fetch(proxyUrl, options)
-    }
-    return fetch(url, options)
-  }
 
   const addAuthEvent = (event, session) => {
     setAuthEvents(prev => [...prev.slice(-4), {
@@ -234,7 +225,7 @@ export const SessionDebug = () => {
         
         // Test simple fetch to Supabase
         addLog('Testing basic Supabase connectivity...')
-        const response = await customFetch(supabase.supabaseUrl + '/rest/v1/', {
+        const response = await fetch(supabase.supabaseUrl + '/rest/v1/', {
           method: 'HEAD',
           headers: {
             'apikey': supabase.supabaseKey
@@ -489,7 +480,7 @@ export const SessionDebug = () => {
       
       for (const endpoint of endpoints) {
         try {
-          const response = await customFetch(supabase.supabaseUrl + endpoint.path, {
+          const response = await fetch(supabase.supabaseUrl + endpoint.path, {
             method: endpoint.method,
             headers: {
               'apikey': supabase.supabaseKey,
@@ -548,7 +539,7 @@ export const SessionDebug = () => {
       // Test CORS first
       addLog('Testing CORS configuration...')
       try {
-        const corsResponse = await customFetch(supabase.supabaseUrl, {
+        const corsResponse = await fetch(supabase.supabaseUrl, {
           method: 'OPTIONS',
           headers: {
             'apikey': supabase.supabaseKey,
@@ -566,7 +557,7 @@ export const SessionDebug = () => {
       }
       
       // Test if project is accessible
-      const response = await customFetch(supabase.supabaseUrl, {
+      const response = await fetch(supabase.supabaseUrl, {
         method: 'GET',
         headers: {
           'apikey': supabase.supabaseKey

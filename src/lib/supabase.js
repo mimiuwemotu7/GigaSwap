@@ -17,32 +17,6 @@ console.log('Using URL:', supabaseUrl)
 console.log('Using Key:', supabaseAnonKey ? 'Present' : 'Missing')
 }
 
-// Helper function to use custom fetch for all requests
-const customFetch = (url, options = {}) => {
-  // Debug environment
-  console.log('🔍 Environment check:', {
-    NODE_ENV: process.env.NODE_ENV,
-    hostname: typeof window !== 'undefined' ? window.location.hostname : 'undefined',
-    isDevelopment: process.env.NODE_ENV === 'development',
-    isProduction: process.env.NODE_ENV === 'production',
-    windowExists: typeof window !== 'undefined'
-  })
-  
-  // Check if we're in development (proxy available) vs production
-  const isDevelopment = process.env.NODE_ENV === 'development' || 
-                       window.location.hostname === 'localhost' ||
-                       window.location.hostname === '127.0.0.1'
-  
-  // In development, route requests through the backend proxy server
-  if (isDevelopment && typeof window !== 'undefined') {
-    const proxyUrl = url.replace(supabaseUrl, 'http://localhost:3001/supabase')
-    console.log('🔄 Proxying request:', url, '→', proxyUrl)
-    return fetch(proxyUrl, options)
-  }
-  // In production, use direct URL
-  console.log('🌐 Direct request:', url)
-  return fetch(url, options)
-}
 
 // Create Supabase client with session-friendly configuration
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
@@ -71,9 +45,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       'X-Client-Info': 'supabase-js-web',
       'apikey': supabaseAnonKey,
       'Authorization': `Bearer ${supabaseAnonKey}`
-    },
-    // Use custom fetch function for all requests
-    fetch: customFetch
+    }
   }
 })
 
@@ -224,7 +196,7 @@ if (typeof window !== 'undefined') {
     
     // Test 1: Check base URL accessibility
     try {
-      const baseResponse = await customFetch(supabaseUrl, { 
+      const baseResponse = await fetch(supabaseUrl, { 
         method: 'HEAD',
         headers: { 'apikey': supabaseAnonKey }
       })
@@ -237,7 +209,7 @@ if (typeof window !== 'undefined') {
     const authPaths = ['/auth/v1/logout', '/auth/v1/signup', '/auth/v1/token']
     for (const path of authPaths) {
       try {
-        const response = await customFetch(`${supabaseUrl}${path}`, { 
+        const response = await fetch(`${supabaseUrl}${path}`, { 
           method: 'POST',
           headers: { 'apikey': supabaseAnonKey }
         })
@@ -252,7 +224,7 @@ if (typeof window !== 'undefined') {
     
     // Test 3: Check REST API endpoint
     try {
-      const restResponse = await customFetch(`${supabaseUrl}/rest/v1/`, { 
+      const restResponse = await fetch(`${supabaseUrl}/rest/v1/`, { 
         method: 'HEAD',
         headers: { 'apikey': supabaseAnonKey }
       })
